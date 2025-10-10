@@ -56,17 +56,17 @@ html, body {
     }
 
     .logo img {
-        height: 60px;
+        height: 50px;
         
         margin-right: 8px;
-        border-radius: 60px;
+        border-radius: 50px;
     }
 
 .search-bar {
     flex-grow: 1;
     min-width: 250px;
     position: relative;
-    margin: 0 20px; /* Add margin for desktop view */
+    margin: 0 150px; /* Add margin for desktop view */
 }
 
     .search-bar input {
@@ -137,7 +137,7 @@ html, body {
 
 /* --- Responsive Styles (for screens 768px or less) --- */
 @media (max-width: 768px) {
-    .search-bar {
+    .search-bar  {
         flex-basis: 100%;
         order: 3;
         width: 90%;
