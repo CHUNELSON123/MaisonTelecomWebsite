@@ -104,7 +104,201 @@ body {
 
 .admin-footer {
     text-align: center;
-    padding: 2rem 0;
+    padding: 1rem 0;
     color: #6c757d;
     margin-top: auto; /* Pushes footer to the bottom */
+    height: 25px;
 }
+
+.admin-layout-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.admin-body-container {
+    display: flex;
+    flex: 1;
+}
+
+.admin-page-content {
+    flex: 1;
+    padding: 20px;
+    background-color: #f4f7fa;
+}
+
+.admin-page-container {
+    width: 100%;
+}
+
+.admin-page-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.admin-content-box {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+}
+
+.admin-content-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+    .admin-content-header h2 {
+        font-size: 20px;
+        margin: 0;
+    }
+
+.add-new-button {
+    font-size: 30px;
+    font-weight: bold;
+    text-decoration: none;
+    color: #333;
+}
+
+.back-button {
+    background-color: #007bff;
+    color: #fff;
+    padding: 5px 10px;
+    border-radius: 3px;
+    text-decoration: none;
+}
+
+.admin-table-container {
+    overflow-x: auto;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+    .admin-table th, .admin-table td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    .admin-table th {
+        background-color: #f2f2f2;
+    }
+
+.view-button {
+    background-color: #28a745;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.edit-button {
+    background-color: #ffc107;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.delete-button {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.admin-pagination {
+    margin-top: 20px;
+}
+
+    .admin-pagination span {
+        margin-right: 10px;
+        cursor: pointer;
+    }
+
+.admin-form-container {
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+    .form-group label {
+        width: 150px;
+        font-weight: bold;
+    }
+
+    .form-group input[type="text"],
+    .form-group select,
+    .form-group textarea {
+        flex: 1;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 3px;
+    }
+
+    .form-group.product-spec select,
+    .form-group.product-spec input {
+        margin-right: 10px;
+    }
+
+        .form-group.product-spec input:last-child {
+            margin-right: 0;
+        }
+
+
+.image-upload-container {
+    display: flex;
+    gap: 10px;
+}
+
+.form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.saved-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.cancel-button {
+    background-color: #dc3545;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+.image-upload-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    flex: 1;
+}
+
+    .image-upload-container input[type="file"] {
+        flex: 0 0 calc(33.333% - 10px);
+    }

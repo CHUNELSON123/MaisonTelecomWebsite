@@ -1,0 +1,89 @@
+﻿.about-us-container {
+    max-width: 900px;
+    margin: 2rem auto;
+    padding: 2rem;
+    font-family: Arial, sans-serif;
+    color: #333;
+}
+
+    .about-us-container h1 {
+        text-align: center;
+        font-size: 2.5rem;
+        margin-bottom: 2rem;
+        font-weight: bold;
+    }
+
+.about-us-content p {
+    line-height: 1.6;
+    margin-bottom: 1rem;
+}
+
+.about-us-content ol {
+    margin-left: 2rem;
+    margin-bottom: 1rem;
+}
+
+.about-us-content li {
+    margin-bottom: 0.5rem;
+}
+
+.shop-now-btn {
+    display: block;
+    width: 200px;
+    margin: 2rem auto;
+    padding: 1rem;
+    background-color: #fff;
+    color: #000;
+    border: 1px solid #000;
+    cursor: pointer;
+    font-size: 1.2rem;
+    text-align: center;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+    .shop-now-btn:hover {
+        background-color: #1E40AF;
+        color: #000;
+    }
+
+
+.quote-section {
+    margin-top: 3rem;
+    text-align: left;
+    border-left: 5px solid #000;
+    padding-left: 1.5rem;
+    margin-left: 2rem;
+}
+
+    .quote-section blockquote {
+        font-style: italic;
+        font-size: 1.2rem;
+        margin: 0;
+    }
+
+    .quote-section p {
+        margin-top: 1rem;
+        font-weight: bold;
+    }
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 768px) {
+    .about-us-container {
+        padding: 1.5rem 1rem;
+        margin: 1rem auto;
+    }
+
+        .about-us-container h1 {
+            font-size: 2rem;
+        }
+
+    .shop-now-btn {
+        width: 100%;
+        font-size: 1.1rem;
+    }
+
+    .quote-section {
+        margin-left: 0;
+        padding-left: 1rem;
+    }
+}

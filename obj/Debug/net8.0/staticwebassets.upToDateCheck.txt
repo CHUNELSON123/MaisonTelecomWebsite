@@ -1,10 +1,12 @@
 wwwroot\app.css
 wwwroot\bootstrap\bootstrap.min.css
 wwwroot\bootstrap\bootstrap.min.css.map
+wwwroot\css\aboutus.css
 wwwroot\css\admin.css
 wwwroot\css\cart.css
 wwwroot\css\checkoutwithoutshipping.css
 wwwroot\css\checkoutwithshipping.css
+wwwroot\css\contactus.css
 wwwroot\css\home.css
 wwwroot\css\product.css
 wwwroot\css\shop.css
