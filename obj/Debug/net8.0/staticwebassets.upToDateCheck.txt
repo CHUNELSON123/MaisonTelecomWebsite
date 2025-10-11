@@ -1,7 +1,9 @@
 wwwroot\app.css
 wwwroot\bootstrap\bootstrap.min.css
 wwwroot\bootstrap\bootstrap.min.css.map
+wwwroot\css\admin.css
 wwwroot\css\cart.css
+wwwroot\css\checkoutwithoutshipping.css
 wwwroot\css\checkoutwithshipping.css
 wwwroot\css\home.css
 wwwroot\css\product.css
@@ -11,4 +13,3 @@ wwwroot\favicon.png
 wwwroot\Image\barca.jpeg
 wwwroot\Image\maisonlogo.jpg
 wwwroot\Image\masonhero.png
-wwwroot\css\checkoutwithoutshipping.css

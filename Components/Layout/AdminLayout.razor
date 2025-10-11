@@ -1,0 +1,13 @@
+﻿@inherits LayoutComponentBase
+@using MaisonTelecom.Components.Layout
+
+<div class="admin-layout-container">
+    <Header />
+    <div class="admin-body-container">
+        <AdminSidebar />
+        <main class="admin-page-content">
+            @Body
+        </main>
+    </div>
+    <AdminFooter />
+</div>
