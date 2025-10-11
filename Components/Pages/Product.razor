@@ -1,0 +1,80 @@
+﻿@page "/product"
+@*
+    This page displays the details for a single product.
+*@
+
+<div class="product-page">
+    <div class="main-content">
+        <div class="image-gallery">
+            <div class="thumbnails">
+                @for (int i = 0; i < 5; i++)
+                {
+                    <img src="/Image/barca.jpeg" alt="iPhone 11 Pro Thumbnail" />
+                }
+            </div>
+            <div class="main-image">
+                <img src="/Image/barca.jpeg" alt="iPhone 11 Pro" />
+            </div>
+        </div>
+        <div class="product-info">
+            <span class="brand">Apple</span>
+            <h1>iPhone 11 Pro</h1>
+            <span class="specs">6GB RAM, 128GB ROM</span>
+            <span class="price">FCFA 120,000</span>
+            <span class="condition">State: New</span>
+            
+            <div class="quantity">
+                <label for="quantity">Quantity:</label>
+                <input type="number" id="quantity" value="1" min="1" />
+            </div>
+            <div class="actions">
+                <button class="add-to-card">Add to Card - FCFA 120,000</button>
+                <button class="add-to-wishlist"><i class="far fa-heart"></i> Add to Wishlist</button>
+                <button class="buy-now">Buy Now</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="product-highlights">
+        <h2>Product Highlights</h2>
+        <div class="highlights-grid">
+            <div class="highlight-item">
+                <i class="fas fa-microchip"></i>
+                <span>Processor type</span>
+                <small>Processor</small>
+            </div>
+            <div class="highlight-item">
+                <i class="fas fa-memory"></i>
+                <span>Storage type</span>
+                <small>Storage</small>
+            </div>
+            <div class="highlight-item">
+                <i class="fas fa-sd-card"></i>
+                <span>RAM type</span>
+                <small>RAM</small>
+            </div>
+            <div class="highlight-item">
+                <i class="fas fa-desktop"></i>
+                <span>Display type</span>
+                <small>EDisplay</small>
+            </div>
+        </div>
+    </div>
+
+    <div class="tech-specs">
+        <h2>Tech Specs</h2>
+        <div class="spec-item">
+            <span>Basic Details</span>
+            <i class="fas fa-plus"></i>
+        </div>
+        <div class="spec-item">
+            <span>Display Properties</span>
+            <i class="fas fa-plus"></i>
+        </div>
+        <div class="spec-item">
+            <span>Special Features</span>
+            <i class="fas fa-plus"></i>
+        </div>
+    </div>
+</div>
+  

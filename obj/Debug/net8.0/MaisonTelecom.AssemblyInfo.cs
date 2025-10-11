@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MaisonTelecom")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+eb3a7eb32d61f0319e866b3a6d2620a50bdcf445")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+0ab47994e1757c351bfb9ec3bd1448b84e4bc05c")]
 [assembly: System.Reflection.AssemblyProductAttribute("MaisonTelecom")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MaisonTelecom")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

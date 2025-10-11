@@ -36,12 +36,36 @@ build_metadata.AdditionalFiles.CssScope =
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xMYXlvdXRcTWFpbkxheW91dC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
+[C:/Users/FLAVIN/Documents/MT/MaisonTelecom/Components/Pages/Cart.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xDYXJ0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/FLAVIN/Documents/MT/MaisonTelecom/Components/Pages/CheckoutWithoutShipping.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xDaGVja291dFdpdGhvdXRTaGlwcGluZy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/FLAVIN/Documents/MT/MaisonTelecom/Components/Pages/CheckoutWithShipping.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xDaGVja291dFdpdGhTaGlwcGluZy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
 [C:/Users/FLAVIN/Documents/MT/MaisonTelecom/Components/Pages/Error.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xFcnJvci5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/FLAVIN/Documents/MT/MaisonTelecom/Components/Pages/Home.razor]
 build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xIb21lLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/FLAVIN/Documents/MT/MaisonTelecom/Components/Pages/Product.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xQcm9kdWN0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/FLAVIN/Documents/MT/MaisonTelecom/Components/Pages/Shop.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xTaG9wLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/FLAVIN/Documents/MT/MaisonTelecom/Components/Pages/Wishlist.razor]
+build_metadata.AdditionalFiles.TargetPath = Q29tcG9uZW50c1xQYWdlc1xXaXNobGlzdC5yYXpvcg==
 build_metadata.AdditionalFiles.CssScope = 
 
 [C:/Users/FLAVIN/Documents/MT/MaisonTelecom/Components/Routes.razor]

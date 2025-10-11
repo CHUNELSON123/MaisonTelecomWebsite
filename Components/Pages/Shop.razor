@@ -1,0 +1,62 @@
+﻿@page "/shop"
+@*
+    This page displays a grid of products with filtering, pagination, and a recently viewed section.
+*@
+
+<div class="shop-page">
+    <div class="sub-header">
+        <div class="filter-bar">
+            <i class="fas fa-home"></i>
+            <button class="filter-btn">Show filter</button>
+        </div>
+        <h1>All Products</h1>
+        <div class="category-filters">
+            <button class="active">Phones</button>
+            <button>Laptops</button>
+            <button>Accessories</button>
+        </div>
+    </div>
+
+    <div class="product-grid">
+        @for (int i = 0; i < 12; i++)
+        {
+            <div class="product-card">
+                <img src="/Image/barca.jpeg" alt="iPhone 11 Pro" />
+                <div class="product-details">
+                    <span class="brand">Apple</span>
+                    <span class="title">iPhone 11 Pro</span>
+                    <span class="specs">6GB RAM, 128GB ROM</span>
+                    <span class="condition">State: New</span>
+                    <span class="price">FCFA 120,000</span>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div class="pagination">
+        <span>&lt;</span>
+        <span class="active">1</span>
+        <span>2</span>
+        <span>3</span>
+        <span>&gt;</span>
+    </div>
+
+    <div class="recently-viewed">
+        <h2>Recently Viewed</h2>
+        <div class="product-grid">
+            @for (int i = 0; i < 4; i++)
+            {
+                <div class="product-card">
+                    <img src="/Image/barca.jpeg" alt="iPhone 11 Pro" />
+                    <div class="product-details">
+                        <span class="brand">Apple</span>
+                        <span class="title">iPhone 11 Pro</span>
+                        <span class="specs">6GB RAM, 128GB ROM</span>
+                        <span class="condition">State: New</span>
+                        <span class="price">FCFA 120,000</span>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
