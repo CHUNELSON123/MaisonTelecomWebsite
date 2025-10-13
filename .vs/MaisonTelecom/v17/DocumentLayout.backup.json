@@ -3,20 +3,20 @@
   "WorkspaceRootPath": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{1703DB45-D7E6-47EB-AAD3-F7913533EB8B}|MaisonTelecom.csproj|c:\\users\\flavin\\documents\\mt\\maisontelecom\\data\\maisontelecomcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{1703DB45-D7E6-47EB-AAD3-F7913533EB8B}|MaisonTelecom.csproj|solutionrelative:data\\maisontelecomcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{1703DB45-D7E6-47EB-AAD3-F7913533EB8B}|MaisonTelecom.csproj|c:\\users\\flavin\\documents\\mt\\maisontelecom\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{1703DB45-D7E6-47EB-AAD3-F7913533EB8B}|MaisonTelecom.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{1703DB45-D7E6-47EB-AAD3-F7913533EB8B}|MaisonTelecom.csproj|c:\\users\\flavin\\documents\\mt\\maisontelecom\\models\\product.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{1703DB45-D7E6-47EB-AAD3-F7913533EB8B}|MaisonTelecom.csproj|solutionrelative:models\\product.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{1703DB45-D7E6-47EB-AAD3-F7913533EB8B}|MaisonTelecom.csproj|c:\\users\\flavin\\documents\\mt\\maisontelecom\\components\\pages\\adminproduct.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
-      "RelativeMoniker": "D:0:0:{1703DB45-D7E6-47EB-AAD3-F7913533EB8B}|MaisonTelecom.csproj|solutionrelative:components\\pages\\adminproduct.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+      "AbsoluteMoniker": "D:0:0:{1703DB45-D7E6-47EB-AAD3-F7913533EB8B}|MaisonTelecom.csproj|c:\\users\\flavin\\documents\\mt\\maisontelecom\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{1703DB45-D7E6-47EB-AAD3-F7913533EB8B}|MaisonTelecom.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{1703DB45-D7E6-47EB-AAD3-F7913533EB8B}|MaisonTelecom.csproj|c:\\users\\flavin\\documents\\mt\\maisontelecom\\components\\pages\\adminaddproduct.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
       "RelativeMoniker": "D:0:0:{1703DB45-D7E6-47EB-AAD3-F7913533EB8B}|MaisonTelecom.csproj|solutionrelative:components\\pages\\adminaddproduct.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{1703DB45-D7E6-47EB-AAD3-F7913533EB8B}|MaisonTelecom.csproj|c:\\users\\flavin\\documents\\mt\\maisontelecom\\components\\pages\\adminproduct.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
+      "RelativeMoniker": "D:0:0:{1703DB45-D7E6-47EB-AAD3-F7913533EB8B}|MaisonTelecom.csproj|solutionrelative:components\\pages\\adminproduct.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{1703DB45-D7E6-47EB-AAD3-F7913533EB8B}|MaisonTelecom.csproj|c:\\users\\flavin\\documents\\mt\\maisontelecom\\wwwroot\\css\\admin.css||{A5401142-F49D-43DB-90B1-F57BA349E55C}",
@@ -25,14 +25,6 @@
     {
       "AbsoluteMoniker": "D:0:0:{1703DB45-D7E6-47EB-AAD3-F7913533EB8B}|MaisonTelecom.csproj|c:\\users\\flavin\\documents\\mt\\maisontelecom\\maisontelecom.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|",
       "RelativeMoniker": "D:0:0:{1703DB45-D7E6-47EB-AAD3-F7913533EB8B}|MaisonTelecom.csproj|solutionrelative:maisontelecom.csproj||{FA3CD31E-987B-443A-9B81-186104E8DAC1}|"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{1703DB45-D7E6-47EB-AAD3-F7913533EB8B}|MaisonTelecom.csproj|c:\\users\\flavin\\documents\\mt\\maisontelecom\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{1703DB45-D7E6-47EB-AAD3-F7913533EB8B}|MaisonTelecom.csproj|solutionrelative:program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{1703DB45-D7E6-47EB-AAD3-F7913533EB8B}|MaisonTelecom.csproj|c:\\users\\flavin\\documents\\mt\\maisontelecom\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
-      "RelativeMoniker": "D:0:0:{1703DB45-D7E6-47EB-AAD3-F7913533EB8B}|MaisonTelecom.csproj|solutionrelative:appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{1703DB45-D7E6-47EB-AAD3-F7913533EB8B}|MaisonTelecom.csproj|c:\\users\\flavin\\documents\\mt\\maisontelecom\\components\\pages\\home.razor||{40D31677-CBC0-4297-A9EF-89D907823A98}",
@@ -174,24 +166,11 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 6,
+          "SelectedChildIndex": 5,
           "Children": [
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{3ae79031-e1bc-11d0-8f78-00a0c9110057}"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "admin.css",
-              "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\wwwroot\\css\\admin.css",
-              "RelativeDocumentMoniker": "wwwroot\\css\\admin.css",
-              "ToolTip": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\wwwroot\\css\\admin.css",
-              "RelativeToolTip": "wwwroot\\css\\admin.css",
-              "ViewState": "AgIAAIcAAAAAAAAAAAAAAGoAAAAOAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
-              "WhenOpened": "2025-10-11T14:55:11.194Z",
-              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -207,7 +186,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "AdminProduct.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Pages\\AdminProduct.razor",
               "RelativeDocumentMoniker": "Components\\Pages\\AdminProduct.razor",
@@ -215,51 +194,24 @@
               "RelativeToolTip": "Components\\Pages\\AdminProduct.razor",
               "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
-              "WhenOpened": "2025-10-11T15:26:10.322Z",
-              "EditorCaption": ""
+              "WhenOpened": "2025-10-11T15:26:10.322Z"
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 2,
               "Title": "AdminAddProduct.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Pages\\AdminAddProduct.razor",
               "RelativeDocumentMoniker": "Components\\Pages\\AdminAddProduct.razor",
               "ToolTip": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Pages\\AdminAddProduct.razor",
               "RelativeToolTip": "Components\\Pages\\AdminAddProduct.razor",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAEAAAAAAAAAAAAAIwFcAAAAqAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000759|",
               "WhenOpened": "2025-10-11T15:28:17.365Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "Product.cs",
-              "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Models\\Product.cs",
-              "RelativeDocumentMoniker": "Models\\Product.cs",
-              "ToolTip": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Models\\Product.cs",
-              "RelativeToolTip": "Models\\Product.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAABAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-12T15:52:01.231Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "MaisonTelecomContext.cs",
-              "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Data\\MaisonTelecomContext.cs",
-              "RelativeDocumentMoniker": "Data\\MaisonTelecomContext.cs",
-              "ToolTip": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Data\\MaisonTelecomContext.cs",
-              "RelativeToolTip": "Data\\MaisonTelecomContext.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAALAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-12T15:54:08.991Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 8,
               "Title": "AdminDashboard.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Pages\\AdminDashboard.razor",
               "RelativeDocumentMoniker": "Components\\Pages\\AdminDashboard.razor",
@@ -271,31 +223,45 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 0,
               "Title": "appsettings.json",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\appsettings.json",
               "RelativeDocumentMoniker": "appsettings.json",
-              "ToolTip": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\appsettings.json",
-              "RelativeToolTip": "appsettings.json",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAMAAAB3AAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\appsettings.json*",
+              "RelativeToolTip": "appsettings.json*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAADAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
-              "WhenOpened": "2025-10-12T11:35:21.804Z"
+              "WhenOpened": "2025-10-12T11:35:21.804Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 1,
               "Title": "Program.cs",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Program.cs",
               "RelativeDocumentMoniker": "Program.cs",
-              "ToolTip": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Program.cs",
-              "RelativeToolTip": "Program.cs",
-              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAABaAAAAAAAAAA==",
+              "ToolTip": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Program.cs*",
+              "RelativeToolTip": "Program.cs*",
+              "ViewState": "AgIAABQAAAAAAAAAAAAAAAEAAAABAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2025-10-12T11:38:10.766Z"
+              "WhenOpened": "2025-10-12T11:38:10.766Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 4,
+              "Title": "admin.css",
+              "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\wwwroot\\css\\admin.css",
+              "RelativeDocumentMoniker": "wwwroot\\css\\admin.css",
+              "ToolTip": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\wwwroot\\css\\admin.css",
+              "RelativeToolTip": "wwwroot\\css\\admin.css",
+              "ViewState": "AgIAAIcAAAAAAAAAAAAAAGoAAAAOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003000|",
+              "WhenOpened": "2025-10-11T14:55:11.194Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
               "Title": "AdminViewCustomer.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Pages\\AdminViewCustomer.razor",
               "RelativeDocumentMoniker": "Components\\Pages\\AdminViewCustomer.razor",
@@ -307,7 +273,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 6,
               "Title": "Home.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Pages\\Home.razor",
               "RelativeDocumentMoniker": "Components\\Pages\\Home.razor",
@@ -319,7 +285,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 7,
               "Title": "AdminCustomer.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Pages\\AdminCustomer.razor",
               "RelativeDocumentMoniker": "Components\\Pages\\AdminCustomer.razor",
@@ -331,7 +297,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 10,
               "Title": "CheckoutWithShipping.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Pages\\CheckoutWithShipping.razor",
               "RelativeDocumentMoniker": "Components\\Pages\\CheckoutWithShipping.razor",
@@ -343,7 +309,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 11,
               "Title": "20251012120557_InitialCommit.cs",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Migrations\\20251012120557_InitialCommit.cs",
               "RelativeDocumentMoniker": "Migrations\\20251012120557_InitialCommit.cs",
@@ -354,7 +320,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 12,
               "Title": "ApplicationDbContext.cs",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Models\\ApplicationDbContext.cs",
               "RelativeDocumentMoniker": "Models\\ApplicationDbContext.cs",
@@ -365,7 +331,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 19,
+              "DocumentIndex": 17,
               "Title": "AdminViewOrder.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Pages\\AdminViewOrder.razor",
               "RelativeDocumentMoniker": "Components\\Pages\\AdminViewOrder.razor",
@@ -377,7 +343,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 18,
+              "DocumentIndex": 16,
               "Title": "AboutUs.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Pages\\AboutUs.razor",
               "RelativeDocumentMoniker": "Components\\Pages\\AboutUs.razor",
@@ -389,7 +355,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 14,
               "Title": "aboutus.css",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\wwwroot\\css\\aboutus.css",
               "RelativeDocumentMoniker": "wwwroot\\css\\aboutus.css",
@@ -401,7 +367,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 17,
+              "DocumentIndex": 15,
               "Title": "contactus.css",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\wwwroot\\css\\contactus.css",
               "RelativeDocumentMoniker": "wwwroot\\css\\contactus.css",
@@ -413,7 +379,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 13,
               "Title": "ContactUs.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Pages\\ContactUs.razor",
               "RelativeDocumentMoniker": "Components\\Pages\\ContactUs.razor",
@@ -425,7 +391,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 20,
+              "DocumentIndex": 18,
               "Title": "AdminOrder.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Pages\\AdminOrder.razor",
               "RelativeDocumentMoniker": "Components\\Pages\\AdminOrder.razor",
@@ -437,7 +403,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 21,
+              "DocumentIndex": 19,
               "Title": "Shop.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Pages\\Shop.razor",
               "RelativeDocumentMoniker": "Components\\Pages\\Shop.razor",
@@ -449,7 +415,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 26,
+              "DocumentIndex": 24,
               "Title": "AdminSidebar.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Layout\\AdminSidebar.razor",
               "RelativeDocumentMoniker": "Components\\Layout\\AdminSidebar.razor",
@@ -461,7 +427,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 22,
+              "DocumentIndex": 20,
               "Title": "App.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\App.razor",
               "RelativeDocumentMoniker": "Components\\App.razor",
@@ -473,7 +439,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 27,
+              "DocumentIndex": 25,
               "Title": "AdminLayout.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Layout\\AdminLayout.razor",
               "RelativeDocumentMoniker": "Components\\Layout\\AdminLayout.razor",
@@ -485,7 +451,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 23,
+              "DocumentIndex": 21,
               "Title": "Cart.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Pages\\Cart.razor",
               "RelativeDocumentMoniker": "Components\\Pages\\Cart.razor",
@@ -497,7 +463,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
+              "DocumentIndex": 23,
               "Title": "Footer.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Layout\\Footer.razor",
               "RelativeDocumentMoniker": "Components\\Layout\\Footer.razor",
@@ -509,7 +475,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 22,
               "Title": "AdminFooter.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Layout\\AdminFooter.razor",
               "RelativeDocumentMoniker": "Components\\Layout\\AdminFooter.razor",
@@ -521,7 +487,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 35,
+              "DocumentIndex": 33,
               "Title": "Wishlist.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Pages\\Wishlist.razor",
               "RelativeDocumentMoniker": "Components\\Pages\\Wishlist.razor",
@@ -533,7 +499,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 33,
+              "DocumentIndex": 31,
               "Title": "cart.css",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\wwwroot\\css\\cart.css",
               "RelativeDocumentMoniker": "wwwroot\\css\\cart.css",
@@ -545,7 +511,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 30,
+              "DocumentIndex": 28,
               "Title": "checkoutwithoutshipping.css",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\wwwroot\\css\\checkoutwithoutshipping.css",
               "RelativeDocumentMoniker": "wwwroot\\css\\checkoutwithoutshipping.css",
@@ -557,7 +523,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 29,
+              "DocumentIndex": 27,
               "Title": "CheckoutWithoutShipping.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Pages\\CheckoutWithoutShipping.razor",
               "RelativeDocumentMoniker": "Components\\Pages\\CheckoutWithoutShipping.razor",
@@ -569,7 +535,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 28,
+              "DocumentIndex": 26,
               "Title": "Header.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Layout\\Header.razor",
               "RelativeDocumentMoniker": "Components\\Layout\\Header.razor",
@@ -581,7 +547,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 32,
+              "DocumentIndex": 30,
               "Title": "wishlist.css",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\wwwroot\\css\\wishlist.css",
               "RelativeDocumentMoniker": "wwwroot\\css\\wishlist.css",
@@ -593,7 +559,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 31,
+              "DocumentIndex": 29,
               "Title": "checkoutwithshipping.css",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\wwwroot\\css\\checkoutwithshipping.css",
               "RelativeDocumentMoniker": "wwwroot\\css\\checkoutwithshipping.css",
@@ -605,7 +571,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 34,
+              "DocumentIndex": 32,
               "Title": "home.css",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\wwwroot\\css\\home.css",
               "RelativeDocumentMoniker": "wwwroot\\css\\home.css",
@@ -617,7 +583,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 38,
+              "DocumentIndex": 36,
               "Title": "shop.css",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\wwwroot\\css\\shop.css",
               "RelativeDocumentMoniker": "wwwroot\\css\\shop.css",
@@ -629,7 +595,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 37,
+              "DocumentIndex": 35,
               "Title": "product.css",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\wwwroot\\css\\product.css",
               "RelativeDocumentMoniker": "wwwroot\\css\\product.css",
@@ -641,7 +607,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 36,
+              "DocumentIndex": 34,
               "Title": "Product.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Pages\\Product.razor",
               "RelativeDocumentMoniker": "Components\\Pages\\Product.razor",
@@ -653,7 +619,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 39,
+              "DocumentIndex": 37,
               "Title": "app.css",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\wwwroot\\app.css",
               "RelativeDocumentMoniker": "wwwroot\\app.css",
@@ -665,7 +631,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 40,
+              "DocumentIndex": 38,
               "Title": "MainLayout.razor",
               "DocumentMoniker": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\Components\\Layout\\MainLayout.razor",
               "RelativeDocumentMoniker": "Components\\Layout\\MainLayout.razor",
