@@ -1,62 +1,61 @@
 ﻿@page "/wishlist"
+@rendermode InteractiveServer
+@using MaisonTelecom.Services
+@inject StateContainer State
+@implements IDisposable
 
 <div class="wishlist-page">
     <div class="wishlist-header">
         <h1>My Wishlist <i class="fas fa-heart"></i></h1>
-        <button class="continue-shopping">Continue Shopping</button>
+        <a href="/shop"><button class="continue-shopping">Continue Shopping</button></a>
     </div>
 
     <div class="wishlist-items">
-        <div class="wishlist-item">
-            <img src="/Image/iphone.jpg" alt="Apple iPhone 11 Pro" class="item-image" />
-            <div class="item-details">
-                <p class="item-brand">Apple</p>
-                <p class="item-name">iPhone 11 Pro</p>
-                <p class="item-specs">6GB RAM, 128GB ROM</p>
-                <p class="item-price">FCFA 120,000</p>
-                <p class="item-state">State: New</p>
-            </div>
-            <div class="item-actions">
-                <a href="#" class="remove-link">Remove</a>
-                <div class="action-buttons">
-                    <button class="buy-now">Buy Now</button>
-                    <button class="add-to-cart">Add to Cart</button>
+        @if (State.Wishlist.Any())
+        {
+            @foreach (var item in State.Wishlist)
+            {
+                <div class="wishlist-item">
+                    <img src="@(string.IsNullOrEmpty(item.ImageURL1) ? "/Image/iphone.jpg" : item.ImageURL1)" alt="@item.Name" class="item-image" />
+                    <div class="item-details">
+                        <p class="item-brand">@item.Brand</p>
+                        <p class="item-name">@item.Name</p>
+                        <p class="item-specs">@item.RAM RAM, @item.ROM ROM</p>
+                        <p class="item-price">FCFA @item.Price.ToString("N0")</p>
+                        <p class="item-state">State: New</p>
+                    </div>
+                    <div class="item-actions">
+                        
+                        <div class="action-buttons">
+                            <button class="buy-now">Buy Now</button>
+                            <button class="add-to-cart" @onclick="() => MoveToCart(item)">Add to Cart</button>
+                            <a href="#" class="remove-link" @onclick="() => State.RemoveFromWishlist(item)" @onclick:preventDefault>Remove</a>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="wishlist-item">
-            <img src="/Image/iphone.jpg" alt="Apple iPhone 11 Pro" class="item-image" />
-            <div class="item-details">
-                <p class="item-brand">Apple</p>
-                <p class="item-name">iPhone 11 Pro</p>
-                <p class="item-specs">6GB RAM, 128GB ROM</p>
-                <p class="item-price">FCFA 120,000</p>
-                <p class="item-state">State: New</p>
-            </div>
-            <div class="item-actions">
-                <a href="#" class="remove-link">Remove</a>
-                <div class="action-buttons">
-                    <button class="buy-now">Buy Now</button>
-                    <button class="add-to-cart">Add to Cart</button>
-                </div>
-            </div>
-        </div>
-        <div class="wishlist-item">
-            <img src="/Image/iphone.jpg" alt="Apple iPhone 11 Pro" class="item-image" />
-            <div class="item-details">
-                <p class="item-brand">Apple</p>
-                <p class="item-name">iPhone 11 Pro</p>
-                <p class="item-specs">6GB RAM, 128GB ROM</p>
-                <p class="item-price">FCFA 120,000</p>
-                <p class="item-state">State: New</p>
-            </div>
-            <div class="item-actions">
-                <a href="#" class="remove-link">Remove</a>
-                <div class="action-buttons">
-                    <button class="buy-now">Buy Now</button>
-                    <button class="add-to-cart">Add to Cart</button>
-                </div>
-            </div>
-        </div>
+            }
+        }
+        else
+        {
+            <p>Your wishlist is empty.</p>
+        }
     </div>
 </div>
+
+@code {
+    protected override void OnInitialized()
+    {
+        State.OnStateChange += StateHasChanged;
+    }
+
+    private void MoveToCart(MaisonTelecom.Models.Product product)
+    {
+        State.AddToCart(product);
+        State.RemoveFromWishlist(product);
+    }
+
+    public void Dispose()
+    {
+        State.OnStateChange -= StateHasChanged;
+    }
+}

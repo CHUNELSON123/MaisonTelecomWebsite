@@ -1,0 +1,42 @@
+﻿@using MaisonTelecom.Services
+@inject StateContainer State
+
+ 
+
+<div class="product-card-wrapper">
+    <div class="product-image-container">
+        <a href="/product/@Product.Id">
+            <img src="@(string.IsNullOrEmpty(Product.ImageURL1) ? "/Image/barca.jpeg" : Product.ImageURL1)" alt="@Product.Name" />
+        </a>
+
+        <div class="card-actions">
+            <div class="icon-container wishlist-icon">
+                <a @onclick="() => State.AddToWishlist(Product)" @onclick:preventDefault title="Add to Wishlist">
+                    <i class="far fa-heart"></i>
+                </a>
+                <span class="tooltip-text">Add to Wishlist</span>
+            </div>
+            <div class="icon-container cart-icon">
+                <a @onclick="() => State.AddToCart(Product)" @onclick:preventDefault title="Add to Cart">
+                    <i class="fas fa-shopping-cart"></i>
+                </a>
+                <span class="tooltip-text">Add to Cart</span>
+            </div>
+        </div>
+    </div>
+
+    <a href="/product/@Product.Id" class="product-details-link">
+        <div class="product-details">
+            <span class="brand">@Product.Brand</span>
+            <span class="title">@Product.Name</span>
+            <span class="specs">@Product.RAM RAM, @Product.ROM ROM</span>
+            <span class="condition">State: New</span>
+            <span class="price">FCFA @Product.Price.ToString("N0")</span>
+        </div>
+    </a>
+</div>
+
+@code {
+    [Parameter]
+    public MaisonTelecom.Models.Product Product { get; set; }
+}

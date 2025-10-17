@@ -64,7 +64,7 @@ html, body {
 
 .search-bar {
     flex-grow: 1;
-    min-width: 250px;
+    min-width: 20px;
     position: relative;
     margin: 0 150px; /* Add margin for desktop view */
 }

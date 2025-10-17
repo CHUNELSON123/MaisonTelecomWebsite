@@ -1,0 +1,81 @@
+﻿/* Main container for the card */
+.product-card-wrapper {
+    border: 1px solid #eee;
+    border-radius: 8px;
+    background: #fff;
+}
+
+/* Container for the image and icons */
+.product-image-container {
+    position: relative;
+}
+
+    .product-image-container img {
+        width: 100%;
+        display: block;
+    }
+
+.product-details-link, .product-details-link:hover {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* This container for icons is now always visible */
+.card-actions {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 12px;
+}
+
+.icon-container {
+    position: relative; /* For tooltip positioning */
+}
+
+    /* NEW STYLES FOR THE ICONS */
+    .icon-container a {
+        display: flex; /* Centers the icon inside the circle */
+        align-items: center;
+        justify-content: center;
+        width: 40px; /* Circle size */
+        height: 40px; /* Circle size */
+        background-color: #007bff; /* A vibrant, site-consistent blue */
+        color: white !important; /* Icon color */
+        border-radius: 50%; /* Makes it a circle */
+        font-size: 1em; /* Adjusted icon size for the circle */
+        transition: transform 0.2s ease, background-color 0.2s ease;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Adds depth */
+        cursor: pointer; /* Changes mouse to pointer on hover */
+    }
+
+        .icon-container a:hover {
+            transform: scale(1.1); /* Slightly enlarge on hover */
+            background-color: #0056b3; /* Darker blue on hover */
+        }
+
+    /* Tooltip text */
+    .icon-container .tooltip-text {
+        visibility: hidden;
+        width: 120px;
+        background-color: #333;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0;
+        position: absolute;
+        z-index: 10;
+        bottom: 140%;
+        left: 50%;
+        margin-left: -60px;
+        opacity: 0;
+        transition: opacity 0.3s;
+        font-size: 12px;
+    }
+
+    .icon-container:hover .tooltip-text {
+        visibility: visible;
+        opacity: 1;
+    }

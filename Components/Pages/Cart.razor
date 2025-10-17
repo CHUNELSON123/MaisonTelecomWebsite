@@ -1,81 +1,54 @@
 ﻿@page "/cart"
+@rendermode InteractiveServer
+@using MaisonTelecom.Services
+@using MaisonTelecom.Models
+@inject StateContainer State
+@implements IDisposable
 
 <div class="cart-page">
     <div class="cart-header">
         <h1>Your Cart</h1>
-        <button class="continue-shopping">Continue Shopping</button>
+        <a href="/shop" class="continue-shopping">Continue Shopping</a>
     </div>
 
     <div class="cart-items">
-        <div class="cart-item">
-            <img src="/Image/iphone.jpg" alt="Apple iPhone 11 Pro" class="item-image" />
-            <div class="item-details">
-                <p class="item-brand">Apple</p>
-                <p class="item-name">iPhone 11 Pro</p>
-                <p class="item-specs">6GB RAM, 128GB ROM</p>
-                <p class="item-price">FCFA 120,000</p>
-                <p class="item-state">State: New</p>
-            </div>
-            <div class="item-actions">
-                <div class="quantity-selector">
-                    <button>-</button>
-                    <span>1</span>
-                    <button>+</button>
+        @if (State.Cart.Any())
+        {
+            @foreach (var item in State.Cart)
+            {
+                <div class="cart-item">
+                    <img src="@(string.IsNullOrEmpty(item.Product.ImageURL1) ? "/Image/iphone.jpg" : item.Product.ImageURL1)" alt="@item.Product.Name" class="item-image" />
+                    <div class="item-details">
+                        <p class="item-brand">@item.Product.Brand</p>
+                        <p class="item-name">@item.Product.Name</p>
+                        <p class="item-specs">@item.Product.RAM RAM, @item.Product.ROM ROM</p>
+                        <p class="item-price">FCFA @item.Product.Price.ToString("N0")</p>
+                        <p class="item-state">State: New</p>
+                    </div>
+                    <div class="item-actions">
+                        <div class="quantity-selector">
+                            <button @onclick="() => State.DecreaseQuantity(item.Product.Id)">-</button>
+                            <span>@item.Quantity</span>
+                            <button @onclick="() => State.IncreaseQuantity(item.Product.Id)">+</button>
+                        </div>
+                        <a href="#" class="remove-link" @onclick="() => State.RemoveFromCart(item)" @onclick:preventDefault>Remove</a>
+                    </div>
+                    <div class="item-total-price">
+                        <p>FCFA @((item.Product.Price * item.Quantity).ToString("N0"))</p>
+                    </div>
                 </div>
-                <a href="#" class="remove-link">Remove</a>
-            </div>
-            <div class="item-total-price">
-                <p>FCFA 120,000</p>
-            </div>
-        </div>
-        <div class="cart-item">
-            <img src="/Image/iphone.jpg" alt="Apple iPhone 11 Pro" class="item-image" />
-            <div class="item-details">
-                <p class="item-brand">Apple</p>
-                <p class="item-name">iPhone 11 Pro</p>
-                <p class="item-specs">6GB RAM, 128GB ROM</p>
-                <p class="item-price">FCFA 120,000</p>
-                <p class="item-state">State: New</p>
-            </div>
-            <div class="item-actions">
-                <div class="quantity-selector">
-                    <button>-</button>
-                    <span>1</span>
-                    <button>+</button>
-                </div>
-                <a href="#" class="remove-link">Remove</a>
-            </div>
-            <div class="item-total-price">
-                <p>FCFA 120,000</p>
-            </div>
-        </div>
-        <div class="cart-item">
-            <img src="/Image/iphone.jpg" alt="Apple iPhone 11 Pro" class="item-image" />
-            <div class="item-details">
-                <p class="item-brand">Apple</p>
-                <p class="item-name">iPhone 11 Pro</p>
-                <p class="item-specs">6GB RAM, 128GB ROM</p>
-                <p class="item-price">FCFA 120,000</p>
-                <p class="item-state">State: New</p>
-            </div>
-            <div class="item-actions">
-                <div class="quantity-selector">
-                    <button>-</button>
-                    <span>1</span>
-                    <button>+</button>
-                </div>
-                <a href="#" class="remove-link">Remove</a>
-            </div>
-            <div class="item-total-price">
-                <p>FCFA 120,000</p>
-            </div>
-        </div>
+            }
+        }
+        else
+        {
+            <p>Your cart is empty.</p>
+        }
     </div>
 
     <div class="cart-summary">
         <div class="subtotal">
             <p>Subtotal</p>
-            <p>FCFA 360,000</p>
+            <p>FCFA @Subtotal.ToString("N0")</p>
         </div>
         <button class="checkout-button">
             <i class="fas fa-lock"></i>
@@ -83,3 +56,17 @@
         </button>
     </div>
 </div>
+
+@code {
+    private decimal Subtotal => State.Cart.Sum(item => item.Product.Price * item.Quantity);
+
+    protected override void OnInitialized()
+    {
+        State.OnStateChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        State.OnStateChange -= StateHasChanged;
+    }
+}

@@ -1,62 +1,118 @@
 ﻿@page "/shop"
-@*
-    This page displays a grid of products with filtering, pagination, and a recently viewed section.
-*@
+@rendermode InteractiveServer
+@using MaisonTelecom.Components.Shared
+@using MaisonTelecom.Data
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext dbContext
 
 <div class="shop-page">
     <div class="sub-header">
         <div class="filter-bar">
-            <i class="fas fa-home"></i>
-            <button class="filter-btn">Show filter</button>
+            <a href="/"><i class="fas fa-home"></i></a>
+            <button class="filter-btn" @onclick="ToggleFilter">Show filter</button>
         </div>
         <h1>All Products</h1>
         <div class="category-filters">
-            <button class="active">Phones</button>
-            <button>Laptops</button>
-            <button>Accessories</button>
+            <button class="@(selectedCategory == "Phones" ? "active" : "")" @onclick='() => FilterByCategory("Phones")'>Phones</button>
+            <button class="@(selectedCategory == "Laptops" ? "active" : "")" @onclick='() => FilterByCategory("Laptops")'>Laptops</button>
+            <button class="@(selectedCategory == "Accessories" ? "active" : "")" @onclick='() => FilterByCategory("Accessories")'>Accessories</button>
         </div>
     </div>
 
+    @if (showFilter)
+    {
+        <div class="filter-options">
+            <p>Filter options will go here...</p>
+        </div>
+    }
+
     <div class="product-grid">
-        @for (int i = 0; i < 12; i++)
+        @if (PagedProducts != null)
         {
-            <div class="product-card">
-                <img src="/Image/barca.jpeg" alt="iPhone 11 Pro" />
-                <div class="product-details">
-                    <span class="brand">Apple</span>
-                    <span class="title">iPhone 11 Pro</span>
-                    <span class="specs">6GB RAM, 128GB ROM</span>
-                    <span class="condition">State: New</span>
-                    <span class="price">FCFA 120,000</span>
-                </div>
-            </div>
+            @foreach (var product in PagedProducts)
+            {
+                <ProductCard Product="product" />
+            }
+        }
+        else
+        {
+            <p>Loading products...</p>
         }
     </div>
 
     <div class="pagination">
-        <span>&lt;</span>
-        <span class="active">1</span>
-        <span>2</span>
-        <span>3</span>
-        <span>&gt;</span>
+        <button disabled="@(CurrentPage == 1)" @onclick="() => NavigateToPage(CurrentPage - 1)">&lt;</button>
+        @for (int i = 1; i <= TotalPages; i++)
+        {
+            var pageNumber = i;
+            <button class="@(CurrentPage == pageNumber ? "active" : "")" @onclick="() => NavigateToPage(pageNumber)">@pageNumber</button>
+        }
+        <button disabled="@(CurrentPage == TotalPages)" @onclick="() => NavigateToPage(CurrentPage + 1)">&gt;</button>
     </div>
 
     <div class="recently-viewed">
         <h2>Recently Viewed</h2>
         <div class="product-grid">
-            @for (int i = 0; i < 4; i++)
+            @if (RecentlyViewedProducts != null)
             {
-                <div class="product-card">
-                    <img src="/Image/barca.jpeg" alt="iPhone 11 Pro" />
-                    <div class="product-details">
-                        <span class="brand">Apple</span>
-                        <span class="title">iPhone 11 Pro</span>
-                        <span class="specs">6GB RAM, 128GB ROM</span>
-                        <span class="condition">State: New</span>
-                        <span class="price">FCFA 120,000</span>
-                    </div>
-                </div>
+                @foreach (var product in RecentlyViewedProducts)
+                {
+                    <ProductCard Product="product" />
+                }
             }
         </div>
     </div>
 </div>
+
+@code {
+    private List<MaisonTelecom.Models.Product> PagedProducts;
+    private List<MaisonTelecom.Models.Product> RecentlyViewedProducts;
+
+    private int CurrentPage = 1;
+    private int PageSize = 18;
+    private int TotalPages;
+    private bool showFilter = false;
+    private string selectedCategory = "Phones";
+
+    protected override async Task OnInitializedAsync()
+    {
+        await UpdateProductList();
+        RecentlyViewedProducts = await dbContext.Products.OrderByDescending(p => p.Id).Take(6).ToListAsync();
+    }
+
+    private async Task UpdateProductList()
+    {
+        var query = dbContext.Products.AsQueryable();
+
+        if (!string.IsNullOrEmpty(selectedCategory))
+        {
+            query = query.Where(p => p.ProductCategory == selectedCategory);
+        }
+
+        var totalProductCount = await query.CountAsync();
+        TotalPages = (int)Math.Ceiling(totalProductCount / (double)PageSize);
+
+        PagedProducts = await query
+            .Skip((CurrentPage - 1) * PageSize)
+            .Take(PageSize)
+            .ToListAsync();
+    }
+
+    private async Task NavigateToPage(int pageNumber)
+    {
+        CurrentPage = pageNumber;
+        await UpdateProductList();
+    }
+
+    private async Task FilterByCategory(string category)
+    {
+        selectedCategory = category;
+        CurrentPage = 1; // Reset to first page
+        await UpdateProductList();
+    }
+
+    private void ToggleFilter()
+    {
+        showFilter = !showFilter;
+    }
+}

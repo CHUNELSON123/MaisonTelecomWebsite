@@ -4022,11 +4022,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\MaisonTelecom.csproj",
+      "projectUniqueName": "C:\\Users\\FLAVIN\\source\\repos\\MaisonTelecom\\MaisonTelecom.csproj",
       "projectName": "MaisonTelecom",
-      "projectPath": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\MaisonTelecom.csproj",
+      "projectPath": "C:\\Users\\FLAVIN\\source\\repos\\MaisonTelecom\\MaisonTelecom.csproj",
       "packagesPath": "C:\\Users\\FLAVIN\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\FLAVIN\\Documents\\MT\\MaisonTelecom\\obj\\",
+      "outputPath": "C:\\Users\\FLAVIN\\source\\repos\\MaisonTelecom\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\DevExpress 25.1\\Components\\Offline Packages",

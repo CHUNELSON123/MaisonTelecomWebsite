@@ -9,9 +9,11 @@ wwwroot\css\checkoutwithshipping.css
 wwwroot\css\contactus.css
 wwwroot\css\home.css
 wwwroot\css\product.css
+wwwroot\css\productcard.css
 wwwroot\css\shop.css
 wwwroot\css\wishlist.css
 wwwroot\favicon.png
 wwwroot\Image\barca.jpeg
 wwwroot\Image\maisonlogo.jpg
 wwwroot\Image\masonhero.png
+wwwroot\js\site.js

@@ -1,80 +1,212 @@
-﻿@page "/product"
-@*
-    This page displays the details for a single product.
-*@
+﻿@page "/product/{Id:int}"
+@rendermode InteractiveServer
+@using Microsoft.EntityFrameworkCore
+@using MaisonTelecom.Data
+@inject ApplicationDbContext dbContext
+@inject IJSRuntime JSRuntime
+
+<style>
+    .spec-item {
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .spec-content {
+        padding-left: 20px;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+    }
+    .spec-content.show {
+        max-height: 500px; /* Adjust as needed */
+        transition: max-height 0.5s ease-in;
+    }
+    .spec-content ul {
+        list-style-type: disc;
+        padding-left: 20px;
+        margin-top: 10px;
+    }
+</style>
 
 <div class="product-page">
-    <div class="main-content">
-        <div class="image-gallery">
-            <div class="thumbnails">
-                @for (int i = 0; i < 5; i++)
+    @if (product != null)
+    {
+        <div class="main-content">
+            <div class="image-gallery">
+                <div class="thumbnails">
+                    @foreach (var imageUrl in GetImageUrls())
+                    {
+                        <img src="@imageUrl" alt="@product.Name Thumbnail" @onclick="() => SetMainImage(imageUrl)" />
+                    }
+                </div>
+                <div class="main-image">
+                    <img src="@mainImageUrl" alt="@product.Name" />
+                </div>
+            </div>
+            <div class="product-info">
+                <span class="brand">@product.Brand</span>
+                <h1>@product.Name</h1>
+                <span class="specs">@product.RAM RAM, @product.ROM ROM</span>
+                <span class="price">FCFA @product.Price.ToString("N0")</span>
+                <span class="condition">State: New</span>
+                
+                <div class="quantity">
+                    <label for="quantity">Quantity:</label>
+                    <input type="number" id="quantity" value="1" min="1" />
+                </div>
+                <div class="actions">
+                    <button class="add-to-card">Add to Card - FCFA @product.Price.ToString("N0")</button>
+                    <button class="add-to-wishlist"><i class="far fa-heart"></i> Add to Wishlist</button>
+                    <button class="buy-now">Buy Now</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="product-highlights">
+             <h2>Product Highlights</h2>
+            <div class="highlights-grid">
+                <div class="highlight-item">
+                    <i class="fas fa-microchip"></i>
+                    <span>@product.Processor</span>
+                    <small>Processor</small>
+                </div>
+                <div class="highlight-item">
+                    <i class="fas fa-memory"></i>
+                    <span>@product.RAM</span>
+                    <small>RAM</small>
+                </div>
+                <div class="highlight-item">
+                    <i class="fas fa-sd-card"></i>
+                    <span>@product.ROM</span>
+                    <small>Storage</small>
+                </div>
+                <div class="highlight-item">
+                    <i class="fas fa-desktop"></i>
+                    <span>@product.Display</span>
+                    <small>Display</small>
+                </div>
+            </div>
+        </div>
+
+        <div class="tech-specs">
+            <h2>Tech Specs</h2>
+            <div class="spec-item" @onclick="() => ToggleSpec(0)">
+                <span>Basic Details</span>
+                <i class="fas @(specVisibility[0] ? "fa-minus" : "fa-plus")"></i>
+            </div>
+            <div class="spec-content @(specVisibility[0] ? "show" : "")">
+                <ul>
+                    @foreach (var item in GetSpecList(product.BasicSpecs))
+                    {
+                        <li>@item</li>
+                    }
+                </ul>
+            </div>
+
+            <div class="spec-item" @onclick="() => ToggleSpec(1)">
+                <span>Display Properties</span>
+                <i class="fas @(specVisibility[1] ? "fa-minus" : "fa-plus")"></i>
+            </div>
+            <div class="spec-content @(specVisibility[1] ? "show" : "")">
+                <ul>
+                    @foreach (var item in GetSpecList(product.DisplayProperties))
+                    {
+                        <li>@item</li>
+                    }
+                </ul>
+            </div>
+
+            <div class="spec-item" @onclick="() => ToggleSpec(2)">
+                <span>Special Features</span>
+                <i class="fas @(specVisibility[2] ? "fa-minus" : "fa-plus")"></i>
+            </div>
+            <div class="spec-content @(specVisibility[2] ? "show" : "")">
+                <ul>
+                    @foreach (var item in GetSpecList(product.SpecialFeatures))
+                    {
+                        <li>@item</li>
+                    }
+                </ul>
+            </div>
+        </div>
+         <div class="product-section">
+            <h2>You May Also Like</h2>
+            <div class="product-carousel">
+                @if (relatedProducts != null)
                 {
-                    <img src="/Image/barca.jpeg" alt="iPhone 11 Pro Thumbnail" />
+                    @foreach (var relatedProduct in relatedProducts)
+                    {
+                        <ProductCard Product="relatedProduct" />
+                    }
                 }
             </div>
-            <div class="main-image">
-                <img src="/Image/barca.jpeg" alt="iPhone 11 Pro" />
-            </div>
         </div>
-        <div class="product-info">
-            <span class="brand">Apple</span>
-            <h1>iPhone 11 Pro</h1>
-            <span class="specs">6GB RAM, 128GB ROM</span>
-            <span class="price">FCFA 120,000</span>
-            <span class="condition">State: New</span>
-            
-            <div class="quantity">
-                <label for="quantity">Quantity:</label>
-                <input type="number" id="quantity" value="1" min="1" />
-            </div>
-            <div class="actions">
-                <button class="add-to-card">Add to Card - FCFA 120,000</button>
-                <button class="add-to-wishlist"><i class="far fa-heart"></i> Add to Wishlist</button>
-                <button class="buy-now">Buy Now</button>
-            </div>
-        </div>
-    </div>
-
-    <div class="product-highlights">
-        <h2>Product Highlights</h2>
-        <div class="highlights-grid">
-            <div class="highlight-item">
-                <i class="fas fa-microchip"></i>
-                <span>Processor type</span>
-                <small>Processor</small>
-            </div>
-            <div class="highlight-item">
-                <i class="fas fa-memory"></i>
-                <span>Storage type</span>
-                <small>Storage</small>
-            </div>
-            <div class="highlight-item">
-                <i class="fas fa-sd-card"></i>
-                <span>RAM type</span>
-                <small>RAM</small>
-            </div>
-            <div class="highlight-item">
-                <i class="fas fa-desktop"></i>
-                <span>Display type</span>
-                <small>EDisplay</small>
-            </div>
-        </div>
-    </div>
-
-    <div class="tech-specs">
-        <h2>Tech Specs</h2>
-        <div class="spec-item">
-            <span>Basic Details</span>
-            <i class="fas fa-plus"></i>
-        </div>
-        <div class="spec-item">
-            <span>Display Properties</span>
-            <i class="fas fa-plus"></i>
-        </div>
-        <div class="spec-item">
-            <span>Special Features</span>
-            <i class="fas fa-plus"></i>
-        </div>
-    </div>
+    }
+    else
+    {
+        <p>Loading product details...</p>
+    }
 </div>
-  
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private MaisonTelecom.Models.Product product;
+    private List<MaisonTelecom.Models.Product> relatedProducts;
+    private string mainImageUrl;
+    private bool[] specVisibility = new bool[3];
+
+    protected override async Task OnParametersSetAsync()
+    {
+        product = await dbContext.Products.FindAsync(Id);
+        if (product != null)
+        {
+            mainImageUrl = product.ImageURL1 ?? "/Image/barca.jpeg";
+            
+            relatedProducts = await dbContext.Products
+                .Where(p => p.ProductCategory == product.ProductCategory && p.Id != product.Id)
+                .Take(4)
+                .ToListAsync();
+        }
+    }
+    
+    // This lifecycle method runs after the component has rendered
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Call the JavaScript function to scroll to the top
+            await JSRuntime.InvokeVoidAsync("scrollToTop");
+        }
+    }
+
+    private IEnumerable<string> GetImageUrls()
+    {
+        if (product == null) yield break;
+        if (!string.IsNullOrEmpty(product.ImageURL1)) yield return product.ImageURL1;
+        if (!string.IsNullOrEmpty(product.ImageURL2)) yield return product.ImageURL2;
+        if (!string.IsNullOrEmpty(product.ImageURL3)) yield return product.ImageURL3;
+        if (!string.IsNullOrEmpty(product.ImageURL4)) yield return product.ImageURL4;
+        if (!string.IsNullOrEmpty(product.ImageURL5)) yield return product.ImageURL5;
+    }
+
+    private void SetMainImage(string imageUrl)
+    {
+        mainImageUrl = imageUrl;
+    }
+
+    private void ToggleSpec(int index)
+    {
+        specVisibility[index] = !specVisibility[index];
+    }
+
+    private string[] GetSpecList(string specs)
+    {
+        if (string.IsNullOrWhiteSpace(specs)) return Array.Empty<string>();
+        return specs.Split(new[] { ',', '\n' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(s => s.Trim())
+                    .ToArray();
+    }
+}

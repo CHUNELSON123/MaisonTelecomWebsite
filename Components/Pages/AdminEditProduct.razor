@@ -1,0 +1,283 @@
+﻿@page "/admin/products/edit/{Id:int}"
+@rendermode InteractiveServer
+@layout MaisonTelecom.Components.Layout.AdminLayout
+@using Microsoft.EntityFrameworkCore
+@using MaisonTelecom.Models
+@using MaisonTelecom.Data
+@using MaisonTelecom.ViewModels
+@inject ApplicationDbContext dbContext
+@inject NavigationManager NavigationManager
+
+<style>
+    /* Aligns the label and input fields in each row */
+    .admin-form-container .form-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+        /* Gives all labels a consistent width, forcing inputs to align */
+        .admin-form-container .form-group > label {
+            width: 160px;
+            min-width: 160px;
+            margin-right: 10px;
+            text-align: left;
+        }
+
+    /* Handles rows with two input fields */
+    .form-group-row {
+        display: flex;
+        align-items: center; /* Align items vertically */
+        gap: 1.5rem; /* Space between columns */
+        margin-bottom: 1rem; /* Space between rows */
+    }
+
+        .form-group-row .form-group {
+            flex: 1;
+            margin-bottom: 0; /* Reset margin for inner groups */
+        }
+
+            .form-group-row .form-group > label {
+                width: auto;
+                min-width: auto;
+            }
+
+    .or-separator {
+        text-align: center;
+        margin: 1.5rem 0;
+        font-weight: bold;
+    }
+
+    .radio-group label {
+        margin-right: 20px;
+        display: inline-flex;
+        align-items: center;
+        width: auto !important;
+    }
+
+    .radio-group input {
+        margin-right: 5px;
+    }
+</style>
+
+<div class="admin-page-container">
+    <h1 class="admin-page-title">Edit Product</h1>
+    @if (ViewModel != null)
+    {
+        <div class="admin-content-box">
+            <div class="admin-content-header">
+                <h2>Edit @ViewModel.Name</h2>
+                <a href="/admin/products" class="back-button">Back</a>
+            </div>
+            <div class="admin-form-container">
+                <EditForm Model="@ViewModel" OnValidSubmit="@HandleUpdateProduct">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    <div class="form-group">
+                        <label>Product Name:</label>
+                        <InputText @bind-Value="ViewModel.Name" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Product Brand:</label>
+                        <InputSelect @bind-Value="ViewModel.Brand" class="form-control">
+                            <option value="">Select Brand</option>
+                            @foreach (var brand in ViewModel.BrandOptions)
+                            {
+                                <option value="@brand">@brand</option>
+                            }
+                        </InputSelect>
+                    </div>
+                    <div class="form-group">
+                        <label>Product Category:</label>
+                        <InputSelect @bind-Value="ViewModel.ProductCategory" class="form-control">
+                            <option value="">Select Category</option>
+                            @foreach (var category in ViewModel.CategoryOptions)
+                            {
+                                <option value="@category">@category</option>
+                            }
+                        </InputSelect>
+                    </div>
+                    <div class="form-group">
+                        <label>Product Price:</label>
+                        <InputNumber @bind-Value="ViewModel.Price" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Product Spec:</label>
+                        <InputSelect @bind-Value="ViewModel.RAM" class="form-control">
+                            <option value="">RAM</option>
+                            @foreach (var ram in ViewModel.RAMOptions)
+                            {
+                                <option value="@ram">@ram</option>
+                            }
+                        </InputSelect>
+                        <InputSelect @bind-Value="ViewModel.ROM" class="form-control">
+                            <option value="">ROM</option>
+                            @foreach (var rom in ViewModel.ROMOptions)
+                            {
+                                <option value="@rom">@rom</option>
+                            }
+                        </InputSelect>
+                    </div>
+                    <div class="form-group">
+                        <label></label>
+                        <InputSelect @bind-Value="ViewModel.Processor" class="form-control">
+                            <option value="">Processor</option>
+                            @foreach (var processor in ViewModel.ProcessorOptions)
+                            {
+                                <option value="@processor">@processor</option>
+                            }
+                        </InputSelect>
+                        <InputSelect @bind-Value="ViewModel.Display" class="form-control">
+                            <option value="">Display</option>
+                            @foreach (var display in ViewModel.DisplayOptions)
+                            {
+                                <option value="@display">@display</option>
+                            }
+                        </InputSelect>
+                    </div>
+                    <div class="form-group">
+                        <label>Stock Quantity:</label>
+                        <InputNumber @bind-Value="ViewModel.StockQuantity" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Basic Specs:</label>
+                        <InputTextArea @bind-Value="ViewModel.BasicSpecs" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Display Properties:</label>
+                        <InputTextArea @bind-Value="ViewModel.DisplayProperties" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label>Special Features:</label>
+                        <InputTextArea @bind-Value="ViewModel.SpecialFeatures" class="form-control" />
+                    </div>
+
+                    <div class="form-group-row">
+                        <div class="form-group"><label>Image URL 1:</label><InputText @bind-Value="ViewModel.ImageURL1" class="form-control" /></div>
+                        <div class="form-group"><label>Image URL 2:</label><InputText @bind-Value="ViewModel.ImageURL2" class="form-control" /></div>
+                    </div>
+                    <div class="form-group-row">
+                        <div class="form-group"><label>Image URL 3:</label><InputText @bind-Value="ViewModel.ImageURL3" class="form-control" /></div>
+                        <div class="form-group"><label>Image URL 4:</label><InputText @bind-Value="ViewModel.ImageURL4" class="form-control" /></div>
+                    </div>
+                    <div class="form-group-row">
+                        <div class="form-group"><label>Image URL 5:</label><InputText @bind-Value="ViewModel.ImageURL5" class="form-control" /></div>
+                        <div class="form-group"></div>
+                    </div>
+
+                    <div class="or-separator">OR</div>
+
+                    <div class="form-group-row">
+                        <div class="form-group"><label>Upload Image 1:</label><InputFile class="form-control" /></div>
+                        <div class="form-group"><label>Upload Image 2:</label><InputFile class="form-control" /></div>
+                    </div>
+                    <div class="form-group-row">
+                        <div class="form-group"><label>Upload Image 3:</label><InputFile class="form-control" /></div>
+                        <div class="form-group"><label>Upload Image 4:</label><InputFile class="form-control" /></div>
+                    </div>
+                    <div class="form-group-row">
+                        <div class="form-group"><label>Upload Image 5:</label><InputFile class="form-control" /></div>
+                        <div class="form-group"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Trending Product:</label>
+                        <InputRadioGroup @bind-Value="ViewModel.IsTrending" class="radio-group">
+                            <label><InputRadio Value="true" /> Yes</label>
+                            <label><InputRadio Value="false" /> No</label>
+                        </InputRadioGroup>
+                    </div>
+                    <div class="form-group">
+                        <label>Latest Product:</label>
+                        <InputRadioGroup @bind-Value="ViewModel.IsLatest" class="radio-group">
+                            <label><InputRadio Value="true" /> Yes</label>
+                            <label><InputRadio Value="false" /> No</label>
+                        </InputRadioGroup>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="saved-button">Update</button>
+                        <button type="button" @onclick="Cancel" class="cancel-button">Cancel</button>
+                    </div>
+                </EditForm>
+            </div>
+        </div>
+    }
+    else
+    {
+        <p>Loading product...</p>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private AdminAddProductViewModel ViewModel;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var product = await dbContext.Products.FindAsync(Id);
+        if (product != null)
+        {
+            ViewModel = new AdminAddProductViewModel
+            {
+                Name = product.Name,
+                Brand = product.Brand,
+                ProductCategory = product.ProductCategory,
+                Price = product.Price,
+                RAM = product.RAM,
+                ROM = product.ROM,
+                Processor = product.Processor,
+                Display = product.Display,
+                StockQuantity = product.StockQuantity,
+                BasicSpecs = product.BasicSpecs,
+                DisplayProperties = product.DisplayProperties,
+                SpecialFeatures = product.SpecialFeatures,
+                ImageURL1 = product.ImageURL1,
+                ImageURL2 = product.ImageURL2,
+                ImageURL3 = product.ImageURL3,
+                ImageURL4 = product.ImageURL4,
+                ImageURL5 = product.ImageURL5,
+                IsTrending = product.IsTrending,
+                IsLatest = product.IsLatest
+            };
+        }
+    }
+
+    private async Task HandleUpdateProduct()
+    {
+        var productToUpdate = await dbContext.Products.FindAsync(Id);
+        if (productToUpdate != null)
+        {
+            productToUpdate.Name = ViewModel.Name;
+            productToUpdate.Brand = ViewModel.Brand;
+            productToUpdate.ProductCategory = ViewModel.ProductCategory;
+            productToUpdate.Price = ViewModel.Price;
+            productToUpdate.RAM = ViewModel.RAM;
+            productToUpdate.ROM = ViewModel.ROM;
+            productToUpdate.Processor = ViewModel.Processor;
+            productToUpdate.Display = ViewModel.Display;
+            productToUpdate.StockQuantity = ViewModel.StockQuantity;
+            productToUpdate.BasicSpecs = ViewModel.BasicSpecs;
+            productToUpdate.DisplayProperties = ViewModel.DisplayProperties;
+            productToUpdate.SpecialFeatures = ViewModel.SpecialFeatures;
+            productToUpdate.ImageURL1 = ViewModel.ImageURL1;
+            productToUpdate.ImageURL2 = ViewModel.ImageURL2;
+            productToUpdate.ImageURL3 = ViewModel.ImageURL3;
+            productToUpdate.ImageURL4 = ViewModel.ImageURL4;
+            productToUpdate.ImageURL5 = ViewModel.ImageURL5;
+            productToUpdate.IsTrending = ViewModel.IsTrending;
+            productToUpdate.IsLatest = ViewModel.IsLatest;
+
+            await dbContext.SaveChangesAsync();
+            NavigationManager.NavigateTo("/admin/products");
+        }
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/admin/products");
+    }
+}

@@ -47,7 +47,7 @@
     }
 
     .category-filters button.active {
-        background-color: #333;
+        background-color: #002366;
         color: #fff;
         border-color: #333;
     }

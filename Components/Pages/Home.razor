@@ -1,187 +1,167 @@
 ﻿@page "/"
+@rendermode InteractiveServer
+@using MaisonTelecom.Components.Shared
+@using MaisonTelecom.Data
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext dbContext
+@inject IJSRuntime JSRuntime
 
 <PageTitle>Home</PageTitle>
+
+<style>
+    .why-choose-us {
+        text-align: center;
+        padding: 50px 20px;
+        background-color: #f8f9fa;
+    }
+    .why-choose-us h2 {
+        margin-bottom: 40px;
+    }
+    .features-grid {
+        display: flex;
+        justify-content: center;
+        gap: 30px;
+        flex-wrap: wrap;
+    }
+    .feature-item {
+        flex-basis: 250px;
+    }
+    .feature-item i {
+        font-size: 2.5em;
+        color: #007bff;
+        margin-bottom: 15px;
+    }
+    .feature-item h3 {
+        font-size: 1.2em;
+        margin-bottom: 10px;
+    }
+    .feature-item p {
+        font-size: 0.9em;
+        color: #6c757d;
+    }
+
+    /* Responsive styles for mobile devices */
+    @@media (max-width: 768px) {
+        .feature-item {
+            /* 50% width minus half the gap to fit two items per row */
+            flex-basis: calc(50% - 15px);
+            text-align: center;
+        }
+    }
+</style>
 
 <div class="hero-section">
     <img src="/Image/masonhero.png" alt="Happy customers shopping for electronics" />
     <div class="hero-text">
-        <button class="btn btn-shop-now">Shop Now</button>
+        <a href="/shop"><button class="btn btn-shop-now">Shop Now</button></a>
     </div>
 </div>
 
 <div class="container mt-5">
+    @* --- Trending, Latest, and Brand Product Sections --- *@
     <section class="product-section">
         <h2>Trending Products</h2>
         <div class="product-carousel">
-            <div class="product-card">
-                <img src="/Image/barca.jpeg" alt="iPhone 11 Pro" />
-                <div class="product-details">
-                    <span class="brand">Apple</span>
-                    <span class="title">iPhone 11 Pro</span>
-                    <span class="specs">6GB RAM, 128GB ROM</span>
-                    <span class="condition">State: New</span>
-                    <span class="price">FCFA 120,000</span>
-                </div>
-            </div>
-            <div class="product-card">
-                <img src="/Image/barca.jpeg" alt="iPhone 11 Pro" />
-                <div class="product-details">
-                    <span class="brand">Apple</span>
-                    <span class="title">iPhone 11 Pro</span>
-                    <span class="specs">6GB RAM, 128GB ROM</span>
-                    <span class="condition">State: New</span>
-                    <span class="price">FCFA 120,000</span>
-                </div>
-            </div>
-            <div class="product-card">
-                <img src="/Image/barca.jpeg" alt="iPhone 11 Pro" />
-                <div class="product-details">
-                    <span class="brand">Apple</span>
-                    <span class="title">iPhone 11 Pro</span>
-                    <span class="specs">6GB RAM, 128GB ROM</span>
-                    <span class="condition">State: New</span>
-                    <span class="price">FCFA 120,000</span>
-                </div>
-            </div>
-            <div class="product-card">
-                <img src="/Image/barca.jpeg" alt="iPhone 11 Pro" />
-                <div class="product-details">
-                    <span class="brand">Apple</span>
-                    <span class="title">iPhone 11 Pro</span>
-                    <span class="specs">6GB RAM, 128GB ROM</span>
-                    <span class="condition">State: New</span>
-                    <span class="price">FCFA 120,000</span>
-                </div>
-            </div>
+            @if (TrendingProducts != null)
+            {
+                @foreach (var product in TrendingProducts)
+                {
+                    <ProductCard Product="product" />
+                }
+            }
         </div>
     </section>
 
     <section class="product-section">
         <h2>Latest Products</h2>
         <div class="category-filters mb-3">
-            <button class="btn active">Phones</button>
-            <button class="btn">Laptops</button>
-            <button class="btn">Accessories</button>
+             <button class="btn @(selectedCategory == "Phones" ? "active" : "")" @onclick='() => LoadLatestProducts("Phones")'>Phones</button>
+            <button class="btn @(selectedCategory == "Laptops" ? "active" : "")" @onclick='() => LoadLatestProducts("Laptops")'>Laptops</button>
+            <button class="btn @(selectedCategory == "Accessories" ? "active" : "")" @onclick='() => LoadLatestProducts("Accessories")'>Accessories</button>
         </div>
         <div class="product-carousel">
-            <div class="product-card">
-                <img src="/Image/barca.jpeg" alt="iPhone 11 Pro" />
-                <div class="product-details">
-                    <span class="brand">Apple</span>
-                    <span class="title">iPhone 11 Pro</span>
-                    <span class="specs">6GB RAM, 128GB ROM</span>
-                    <span class="condition">State: New</span>
-                    <span class="price">FCFA 120,000</span>
-                </div>
-            </div>
-            <div class="product-card">
-                <img src="/Image/barca.jpeg" alt="iPhone 11 Pro" />
-                <div class="product-details">
-                    <span class="brand">Apple</span>
-                    <span class="title">iPhone 11 Pro</span>
-                    <span class="specs">6GB RAM, 128GB ROM</span>
-                    <span class="condition">State: New</span>
-                    <span class="price">FCFA 120,000</span>
-                </div>
-            </div>
-            <div class="product-card">
-                <img src="/Image/barca.jpeg" alt="iPhone 11 Pro" />
-                <div class="product-details">
-                    <span class="brand">Apple</span>
-                    <span class="title">iPhone 11 Pro</span>
-                    <span class="specs">6GB RAM, 128GB ROM</span>
-                    <span class="condition">State: New</span>
-                    <span class="price">FCFA 120,000</span>
-                </div>
-            </div>
-            <div class="product-card">
-                <img src="/Image/barca.jpeg" alt="iPhone 11 Pro" />
-                <div class="product-details">
-                    <span class="brand">Apple</span>
-                    <span class="title">iPhone 11 Pro</span>
-                    <span class="specs">6GB RAM, 128GB ROM</span>
-                    <span class="condition">State: New</span>
-                    <span class="price">FCFA 120,000</span>
-                </div>
-            </div>
+            @if (LatestProducts != null)
+            {
+                @foreach (var product in LatestProducts)
+                {
+                    <ProductCard Product="product" />
+                }
+            }
         </div>
     </section>
 
     <section class="product-section">
         <h2>Product Brand</h2>
         <div class="category-filters mb-3">
-            <button class="btn active">Apple</button>
-            <button class="btn">Samsung</button>
-            <button class="btn">Infinix</button>
+            <button class="btn @(selectedBrand == "Apple" ? "active" : "")" @onclick='() => LoadBrandProducts("Apple")'>Apple</button>
+            <button class="btn @(selectedBrand == "Samsung" ? "active" : "")" @onclick='() => LoadBrandProducts("Samsung")'>Samsung</button>
+            <button class="btn @(selectedBrand == "Infinix" ? "active" : "")" @onclick='() => LoadBrandProducts("Infinix")'>Infinix</button>
         </div>
         <div class="product-carousel">
-            <div class="product-card">
-                <img src="/Image/barca.jpeg" alt="iPhone 11 Pro" />
-                <div class="product-details">
-                    <span class="brand">Apple</span>
-                    <span class="title">iPhone 11 Pro</span>
-                    <span class="specs">6GB RAM, 128GB ROM</span>
-                    <span class="condition">State: New</span>
-                    <span class="price">FCFA 120,000</span>
-                </div>
-            </div>
-            <div class="product-card">
-                <img src="/Image/barca.jpeg" alt="iPhone 11 Pro" />
-                <div class="product-details">
-                    <span class="brand">Apple</span>
-                    <span class="title">iPhone 11 Pro</span>
-                    <span class="specs">6GB RAM, 128GB ROM</span>
-                    <span class="condition">State: New</span>
-                    <span class="price">FCFA 120,000</span>
-                </div>
-            </div>
-            <div class="product-card">
-                <img src="/Image/barca.jpeg" alt="iPhone 11 Pro" />
-                <div class="product-details">
-                    <span class="brand">Apple</span>
-                    <span class="title">iPhone 11 Pro</span>
-                    <span class="specs">6GB RAM, 128GB ROM</span>
-                    <span class="condition">State: New</span>
-                    <span class="price">FCFA 120,000</span>
-                </div>
-            </div>
-            <div class="product-card">
-                <img src="/Image/barca.jpeg" alt="iPhone 11 Pro" />
-                <div class="product-details">
-                    <span class="brand">Apple</span>
-                    <span class="title">iPhone 11 Pro</span>
-                    <span class="specs">6GB RAM, 128GB ROM</span>
-                    <span class="condition">State: New</span>
-                    <span class="price">FCFA 120,000</span>
-                </div>
-            </div>>
-        </div>
-    </section>
-
-    <section class="reviews-section">
-        <h2>Reviews</h2>
-        <div class="reviews-carousel">
-            <div class="review-card">
-                <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante."</p>
-                <div class="reviewer">
-                    <img src="/Image/barca.jpeg" alt="Reviewer">
-                    <span>JOHN DOE</span>
-                </div>
-            </div>
-            <div class="review-card">
-                <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante."</p>
-                <div class="reviewer">
-                    <img src="/Image/barca.jpeg" alt="Reviewer">
-                    <span>CHUNELSON</span>
-                </div>
-            </div>
-            <div class="review-card">
-                <p>"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer posuere erat a ante."</p>
-                <div class="reviewer">
-                    <img src="/Image/barca.jpeg" alt="Reviewer">
-                    <span>JOHN DOE</span>
-                </div>
-            </div>
+            @if (BrandProducts != null)
+            {
+                @foreach (var product in BrandProducts)
+                {
+                    <ProductCard Product="product" />
+                }
+            }
         </div>
     </section>
 </div>
+
+@* --- Why Choose Us Section --- *@
+<section class="why-choose-us">
+    <div class="container">
+        <h2>Why Choose Us?</h2>
+        <div class="features-grid">
+            <div class="feature-item">
+                <i class="fas fa-shipping-fast"></i>
+                <h3>Fast Delivery</h3>
+                <p>Get your products delivered to your doorstep with our express shipping service.</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-headset"></i>
+                <h3>24/7 Support</h3>
+                <p>Our customer service team is here to help you around the clock with any questions.</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-check-circle"></i>
+                <h3>Quality Guaranteed</h3>
+                <p>We only source the best products, ensuring quality and reliability for our customers.</p>
+            </div>
+            <div class="feature-item">
+                <i class="fas fa-lock"></i>
+                <h3>Secure Payments</h3>
+                <p>Shop with confidence using our secure payment gateway for all transactions.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@code {
+    private List<MaisonTelecom.Models.Product> TrendingProducts;
+    private List<MaisonTelecom.Models.Product> LatestProducts;
+    private List<MaisonTelecom.Models.Product> BrandProducts;
+    private string selectedBrand = "Apple";
+    private string selectedCategory = "Phones";
+
+    protected override async Task OnInitializedAsync()
+    {
+        TrendingProducts = await dbContext.Products.Where(p => p.IsTrending).Take(9).ToListAsync();
+        await LoadLatestProducts(selectedCategory);
+        await LoadBrandProducts(selectedBrand);
+    }
+
+    private async Task LoadLatestProducts(string category)
+    {
+        selectedCategory = category;
+        LatestProducts = await dbContext.Products.Where(p => p.IsLatest && p.ProductCategory == category).Take(9).ToListAsync();
+    }
+
+    private async Task LoadBrandProducts(string brandName)
+    {
+        selectedBrand = brandName;
+        BrandProducts = await dbContext.Products.Where(p => p.Brand == brandName).Take(9).ToListAsync();
+    }
+}

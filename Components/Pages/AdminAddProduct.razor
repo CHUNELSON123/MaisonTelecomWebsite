@@ -1,5 +1,62 @@
 ﻿@page "/admin/products/add"
+@rendermode InteractiveServer
 @layout MaisonTelecom.Components.Layout.AdminLayout
+@using MaisonTelecom.ViewModels
+@using MaisonTelecom.Data
+@inject ApplicationDbContext dbContext
+@inject NavigationManager NavigationManager
+
+<style>
+    /* Aligns the label and input fields in each row */
+    .admin-form-container .form-group {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+        /* Gives all labels a consistent width, forcing inputs to align */
+        .admin-form-container .form-group > label {
+            width: 160px;
+            min-width: 160px;
+            margin-right: 10px;
+            text-align: left;
+        }
+
+    /* Handles rows with two input fields */
+    .form-group-row {
+        display: flex;
+        align-items: center; /* Align items vertically */
+        gap: 1.5rem; /* Space between columns */
+        margin-bottom: 1rem; /* Space between rows */
+    }
+
+        .form-group-row .form-group {
+            flex: 1;
+            margin-bottom: 0; /* Reset margin for inner groups */
+        }
+
+            .form-group-row .form-group > label {
+                width: auto;
+                min-width: auto;
+            }
+
+    .or-separator {
+        text-align: center;
+        margin: 1.5rem 0;
+        font-weight: bold;
+    }
+
+    .radio-group label {
+        margin-right: 20px;
+        display: inline-flex;
+        align-items: center;
+        width: auto !important;
+    }
+
+    .radio-group input {
+        margin-right: 5px;
+    }
+</style>
 
 <div class="admin-page-container">
     <h1 class="admin-page-title">Add Product</h1>
@@ -9,94 +66,159 @@
             <a href="/admin/products" class="back-button">Back</a>
         </div>
         <div class="admin-form-container">
-            <div class="form-group">
-                <label>Product Name:</label>
-                <input type="text" />
-            </div>
-            <div class="form-group">
-                <label>Product Brand:</label>
-                <select>
-                    <option></option>
-                </select>
-            </div>
-            <div class="form-group">
-                <label>Product Price:</label>
-                <input type="text" />
-            </div>
-            <div class="form-group product-spec">
-                <label>Product Spec:</label>
-                <select>
-                    <option>RAM</option>
-                </select>
-                <select>
-                    <option>ROM</option>
-                </select>
-            </div>
-            <div class="form-group product-spec">
-                <label></label>
-                <input type="text" placeholder="Processor" />
-                <input type="text" placeholder="EDisplay" />
-            </div>
-            <div class="form-group">
-                <label>Stock Quantity:</label>
-                <input type="text" />
-            </div>
-            <div class="form-group">
-                <label>Basic Specs:</label>
-                <textarea></textarea>
-            </div>
-            <div class="form-group">
-                <label>Display Properties:</label>
-                <textarea></textarea>
-            </div>
-            <div class="form-group">
-                <label>Special Features:</label>
-                <textarea></textarea>
-            </div>
-            <div class="form-group">
-                <label>Image Upload:</label>
-                <div class="image-upload-container">
-                    <input type="file" />
-                    <input type="file" />
-                    <input type="file" />
-                    <input type="file" />
-                    <input type="file" />
+            <EditForm Model="@ViewModel" OnValidSubmit="@HandleAddProduct">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="form-group">
+                    <label>Product Name:</label>
+                    <InputText @bind-Value="ViewModel.Name" class="form-control" />
                 </div>
-            </div>
-            <div class="form-group">
-                <label>Image URL 1:</label>
-                <input type="text" />
-            </div>
-            <div class="form-group">
-                <label>Image URL 2:</label>
-                <input type="text" />
-            </div>
-            <div class="form-group">
-                <label>Image URL 3:</label>
-                <input type="text" />
-            </div>
-            <div class="form-group">
-                <label>Image URL 4:</label>
-                <input type="text" />
-            </div>
-            <div class="form-group">
-                <label>Image URL 5:</label>
-                <input type="text" />
-            </div>
-            <div class="form-group">
-                <label>Trending Product:</label>
-                <input type="radio" /> Yes
-                <input type="radio" /> No
-            </div>
-            <div class="form-group">
-                <label>Laatest Product:</label>
-                <input type="radio" /> Yes
-                <input type="radio" /> No
-            </div>
-            <div class="form-actions">
-                <button class="saved-button">Saved</button>
-                <button class="cancel-button">Cancel</button>
-            </div>
+                <div class="form-group">
+                    <label>Product Brand:</label>
+                    <InputSelect @bind-Value="ViewModel.Brand" class="form-control">
+                        <option value="">Select Brand</option>
+                        @foreach (var brand in ViewModel.BrandOptions)
+                        {
+                            <option value="@brand">@brand</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="form-group">
+                    <label>Product Category:</label>
+                    <InputSelect @bind-Value="ViewModel.ProductCategory" class="form-control">
+                        <option value="">Select Category</option>
+                        @foreach (var category in ViewModel.CategoryOptions)
+                        {
+                            <option value="@category">@category</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="form-group">
+                    <label>Product Price:</label>
+                    <InputNumber @bind-Value="ViewModel.Price" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Product Spec:</label>
+                    <InputSelect @bind-Value="ViewModel.RAM" class="form-control">
+                        <option value="">RAM</option>
+                        @foreach (var ram in ViewModel.RAMOptions)
+                        {
+                            <option value="@ram">@ram</option>
+                        }
+                    </InputSelect>
+                    <InputSelect @bind-Value="ViewModel.ROM" class="form-control">
+                        <option value="">ROM</option>
+                        @foreach (var rom in ViewModel.ROMOptions)
+                        {
+                            <option value="@rom">@rom</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="form-group">
+                    <label></label>
+                    <InputSelect @bind-Value="ViewModel.Processor" class="form-control">
+                        <option value="">Processor</option>
+                        @foreach (var processor in ViewModel.ProcessorOptions)
+                        {
+                            <option value="@processor">@processor</option>
+                        }
+                    </InputSelect>
+                    <InputSelect @bind-Value="ViewModel.Display" class="form-control">
+                        <option value="">Display</option>
+                        @foreach (var display in ViewModel.DisplayOptions)
+                        {
+                            <option value="@display">@display</option>
+                        }
+                    </InputSelect>
+                </div>
+                <div class="form-group">
+                    <label>Stock Quantity:</label>
+                    <InputNumber @bind-Value="ViewModel.StockQuantity" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Basic Specs:</label>
+                    <InputTextArea @bind-Value="ViewModel.BasicSpecs" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Display Properties:</label>
+                    <InputTextArea @bind-Value="ViewModel.DisplayProperties" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label>Special Features:</label>
+                    <InputTextArea @bind-Value="ViewModel.SpecialFeatures" class="form-control" />
+                </div>
+
+                <div class="form-group-row">
+                    <div class="form-group"><label>Image URL 1:</label><InputText @bind-Value="ViewModel.ImageURL1" class="form-control" /></div>
+                    <div class="form-group"><label>Image URL 2:</label><InputText @bind-Value="ViewModel.ImageURL2" class="form-control" /></div>
+                </div>
+                <div class="form-group-row">
+                    <div class="form-group"><label>Image URL 3:</label><InputText @bind-Value="ViewModel.ImageURL3" class="form-control" /></div>
+                    <div class="form-group"><label>Image URL 4:</label><InputText @bind-Value="ViewModel.ImageURL4" class="form-control" /></div>
+                </div>
+                <div class="form-group-row">
+                    <div class="form-group"><label>Image URL 5:</label><InputText @bind-Value="ViewModel.ImageURL5" class="form-control" /></div>
+                    <div class="form-group"></div>
+                </div>
+
+                <div class="or-separator">OR</div>
+
+                <div class="form-group-row">
+                    <div class="form-group"><label>Upload Image 1:</label><InputFile class="form-control" /></div>
+                    <div class="form-group"><label>Upload Image 2:</label><InputFile class="form-control" /></div>
+                </div>
+                <div class="form-group-row">
+                    <div class="form-group"><label>Upload Image 3:</label><InputFile class="form-control" /></div>
+                    <div class="form-group"><label>Upload Image 4:</label><InputFile class="form-control" /></div>
+                </div>
+                <div class="form-group-row">
+                    <div class="form-group"><label>Upload Image 5:</label><InputFile class="form-control" /></div>
+                    <div class="form-group"></div>
+                </div>
+
+                <div class="form-group">
+                    <label>Trending Product:</label>
+                    <InputRadioGroup @bind-Value="ViewModel.IsTrending" class="radio-group">
+                        <label><InputRadio Value="true" /> Yes</label>
+                        <label><InputRadio Value="false" /> No</label>
+                    </InputRadioGroup>
+                </div>
+                <div class="form-group">
+                    <label>Latest Product:</label>
+                    <InputRadioGroup @bind-Value="ViewModel.IsLatest" class="radio-group">
+                        <label><InputRadio Value="true" /> Yes</label>
+                        <label><InputRadio Value="false" /> No</label>
+                    </InputRadioGroup>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="saved-button">Save</button>
+                    <button type="button" @onclick="Cancel" class="cancel-button">Cancel</button>
+                </div>
+            </EditForm>
         </div>
     </div>
 </div>
+
+@code {
+    private AdminAddProductViewModel ViewModel { get; set; } = new AdminAddProductViewModel();
+
+    private async Task HandleAddProduct()
+    {
+        var newProduct = ViewModel.ToProduct();
+        dbContext.Products.Add(newProduct);
+        await dbContext.SaveChangesAsync();
+        NavigationManager.NavigateTo("/admin/products");
+    }
+
+    private void Cancel()
+    {
+        NavigationManager.NavigateTo("/admin/products");
+    }
+
+    private void LoadFiles(InputFileChangeEventArgs e)
+    {
+        // Your file upload logic will go here
+    }
+}

@@ -1,5 +1,12 @@
 ﻿@page "/admin/products"
+@rendermode InteractiveServer
 @layout MaisonTelecom.Components.Layout.AdminLayout
+@using Microsoft.EntityFrameworkCore
+@using MaisonTelecom.Data
+@using Microsoft.JSInterop
+@inject ApplicationDbContext dbContext
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 
 <div class="admin-page-container">
     <h1 class="admin-page-title">Product</h1>
@@ -15,13 +22,35 @@
                         <th>S/N</th>
                         <th>Product Name</th>
                         <th>Product Brand</th>
-                        <th>Product Model</th>
+                        <th>Product Category</th>
                         <th>Price</th>
                         <th>Quantity</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
+                    @if (products == null)
+                    {
+                        <tr><td colspan="7">Loading...</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var (product, index) in products.Select((p, i) => (p, i + 1)))
+                        {
+                            <tr>
+                                <td>@index</td>
+                                <td>@product.Name</td>
+                                <td>@product.Brand</td>
+                                <td>@product.ProductCategory</td>
+                                <td>@product.Price.ToString("C")</td>
+                                <td>@product.StockQuantity</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" @onclick="() => EditProduct(product.Id)">Edit</button>
+                                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteProduct(product.Id)">Delete</button>
+                                </td>
+                            </tr>
+                        }
+                    }
                 </tbody>
             </table>
         </div>
@@ -33,3 +62,34 @@
         </div>
     </div>
 </div>
+
+@code {
+    private List<MaisonTelecom.Models.Product> products;
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await dbContext.Products.OrderBy(p => p.Name).ToListAsync();
+    }
+
+    private void EditProduct(int productId)
+    {
+        NavigationManager.NavigateTo($"/admin/products/edit/{productId}");
+    }
+
+    private async Task DeleteProduct(int productId)
+    {
+        var product = await dbContext.Products.FindAsync(productId);
+        if (product != null)
+        {
+            // Ask for confirmation before deleting
+            var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete {product.Name}?");
+            if (confirmed)
+            {
+                dbContext.Products.Remove(product);
+                await dbContext.SaveChangesAsync();
+                products.Remove(product); // Update the UI
+                StateHasChanged(); // Re-render the component
+            }
+        }
+    }
+}
