@@ -3,24 +3,45 @@
     border: 1px solid #eee;
     border-radius: 8px;
     background: #fff;
+    display: flex; /* Using Flexbox for a flexible layout */
+    flex-direction: column;
+    height: 100%; /* Important: makes the card fill its container in the shop grid */
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
 }
 
 /* Container for the image and icons */
 .product-image-container {
     position: relative;
+    width: 100%;
 }
 
     .product-image-container img {
         width: 100%;
         display: block;
+        aspect-ratio: 1 / 1; /* This is the key: creates a perfect square that scales */
+        object-fit: cover; /* Ensures the image fills the square without distortion */
     }
 
-.product-details-link, .product-details-link:hover {
+/* Link for the details section */
+.product-details-link {
     text-decoration: none;
     color: inherit;
+    padding: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    flex-grow: 1; /* Allows this section to fill the remaining vertical space */
+    overflow: hidden;
 }
 
-/* This container for icons is now always visible */
+.product-details span {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* --- YOUR ICON AND TOOLTIP STYLES (UNCHANGED) --- */
 .card-actions {
     position: absolute;
     bottom: 0;
@@ -32,31 +53,29 @@
 }
 
 .icon-container {
-    position: relative; /* For tooltip positioning */
+    position: relative;
 }
 
-    /* NEW STYLES FOR THE ICONS */
     .icon-container a {
-        display: flex; /* Centers the icon inside the circle */
+        display: flex;
         align-items: center;
         justify-content: center;
-        width: 40px; /* Circle size */
-        height: 40px; /* Circle size */
-        background-color: #1E40AF; /* A vibrant, site-consistent blue */
-        color: white !important; /* Icon color */
-        border-radius: 50%; /* Makes it a circle */
-        font-size: 1em; /* Adjusted icon size for the circle */
+        width: 40px;
+        height: 40px;
+        background-color: #1E40AF;
+        color: white !important;
+        border-radius: 50%;
+        font-size: 1em;
         transition: transform 0.2s ease, background-color 0.2s ease;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Adds depth */
-        cursor: pointer; /* Changes mouse to pointer on hover */
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        cursor: pointer;
     }
 
         .icon-container a:hover {
-            transform: scale(1.1); /* Slightly enlarge on hover */
-            background-color: #0056b3; /* Darker blue on hover */
+            transform: scale(1.1);
+            background-color: #0056b3;
         }
 
-    /* Tooltip text */
     .icon-container .tooltip-text {
         visibility: hidden;
         width: 120px;
