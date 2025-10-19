@@ -142,6 +142,21 @@ namespace MaisonTelecom.Services
             await LoadCartAsync();
         }
 
+        public async Task UpdateCartItemQuantity(CartItem cartItem, int newQuantity)
+        {
+            if (!_isInitialized) await InitializeAsync();
+
+            using var context = await _dbContextFactory.CreateDbContextAsync();
+            var itemToUpdate = await context.CartItems.FindAsync(cartItem.Id);
+
+            if (itemToUpdate != null)
+            {
+                itemToUpdate.Quantity = newQuantity;
+                await context.SaveChangesAsync();
+                await LoadCartAsync();
+            }
+        }
+
         public async Task IncreaseQuantity(int productId)
         {
             if (!_isInitialized) await InitializeAsync();

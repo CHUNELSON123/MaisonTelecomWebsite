@@ -5,6 +5,7 @@
 @using MaisonTelecom.ViewModels
 @inject StateContainer State
 @inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
 @implements IDisposable
 
 <div class="checkout-page">
@@ -39,13 +40,13 @@
                     <InputText @bind-Value="checkoutModel.LastName" placeholder="Last Name" />
                 </div>
                 <InputText @bind-Value="checkoutModel.PhoneNumber" placeholder="Phone Number" />
-                <InputText @bind-Value="checkoutModel.Address1" placeholder="Address 1" />
-                <InputText @bind-Value="checkoutModel.Address2" placeholder="Address 2" />
-                <InputText @bind-Value="checkoutModel.Address3" placeholder="Address 3" />
+                <InputText @bind-Value="checkoutModel.Address1" placeholder="Address 1 (Optional)" />
+                <InputText @bind-Value="checkoutModel.Address2" placeholder="Address 2 (Optional)" />
+                <InputText @bind-Value="checkoutModel.Address3" placeholder="Address 3 (Optional)" />
                 <div class="form-row">
                     <InputText @bind-Value="checkoutModel.TownCity" placeholder="Town/City" />
                     <InputSelect @bind-Value="checkoutModel.Region">
-                        <option value="">Region</option>
+                        <option value="">Region (Optional)</option>
                         <option value="Adamaoua">Adamaoua</option>
                         <option value="Centre">Centre</option>
                         <option value="East">East</option>
@@ -58,6 +59,7 @@
                         <option value="West">West</option>
                     </InputSelect>
                 </div>
+                <ValidationSummary />
             </div>
 
             <div class="payment-section">
@@ -66,14 +68,34 @@
                 <div class="payment-methods">
                     <p>Payment Methods</p>
                     <div>
-                        <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMy4zMyAzMiI+PHBhdGggZD0iTTIzLDJWMzBoLjc5Yy4yOSwwLC41My0uMjQsLjUzLS41NFYyLjU0YzAtLjI5LS4yNC0uNTQtLjUzLS41NGgtLjc5WiIgZmlsbD0iI2ZjMGUwMCIvPjxwYXRoIGQ9Ik0yMywyVjMwSDUuODhjLS4yOSwwLS41My0uMjQtLjUzLS41NFYyLjU0YzAtLjI5LC4yNC0uNTQsLjUzLS41NGg1Ljg2VjJoOC43M1oiIGZpbGw9IiNmZGNjMDAiLz48cGF0aCBkPSJtNC42MywxMC45NnYxMC4xNGMwLC4yOS0uMjQsLjUzLS41MywuNTNIMy41NGMtLjI5LDAtLjUzLS4yNC0uNTMtLjUzVjExYy4wMS0uMywuMjQtLjUzLC41NC0uNTNoLjU5Yy4yOSwwLC41MywuMjQuNTMsLjU0WiIgZmlsbD0iI2M5M2ExMCIvPjxwYXRoIGQ9Ik0zLjU0LDIxLjYyYy0uMywwLS41NC0uMjQtLjU0LS41NFYxMS4wMWMwLS4zLC4yNC0uNTMsLjU0LS41M2gxLjA5VjIxLjYyaC0xLjA5WiIgZmlsbD0iI2YyYjYwMCIvPjxwYXRoIGQ9Ik0yMywyVjMwSDkuNTJjLS4zLDAtLjU0LS4yNC0uNTQtLjU0VjIuNTRjMC0uMywuMjQtLjU0LC41NC0uNTNoMS4wN1YySDIzWiIgZmlsbD0iI2ZmZTc5OCIvPjxwYXRoIGQ9Im0xOC40MSwyNGgtMS4zN2ExLjM4LDEuMzgsMCwwLDEtMS4zNy0xLjM3di0uNzJjMC0uNzYuNjItMS4zNywxLjM3LTEuMzdoMS4zN1oiIGZpbGw9IiMwMDkzZDAiLz48cGF0aCBkPSJtMTcuMDUsMjAuNTFoMS4zN1YyNEgxNi4yN2ExLjM4LDEuMzgsMCwwLDEtMS4zOC0xLjM4di0uNzJjMC0uNzYuNjEtMS4zOCwxLjM4LTEuMzhaIiBmaWxsPSIjMDA3OWNjIi8+PHBhdGggZD0ibTE4LjQxLDIwLjUxaC0xLjM3YTEuMzcsMS4zNywwLDAsMC0xLjM4LDEuMzh2LjcyYzAsLjc2LjYyLDEuMzgsMS4zOCwxLjM4aDEuMzdaIiBmaWxsPSIjMDA4NmNhIi8+PHBhdGggZD0ibTE4LjE0LDIwLjUxaC0xLjA5di41NGMwLC4zLS4yNC41NC0uNTQuNTNoLS4yN2ExLjM3LDEuMzcsMCwwLDAtMS4zOCwxLjM4di43MmMwLC43Ni42MiwxLjM4LDEuMzgsMS4zOGgxLjM3di0zLjU1WiIgZmlsbD0iIzAwYTJkMiIvPjxwYXRoIGQ9Im0yMS4yNiwyMC41MXYtMS4wOWMwLS4zLS4yNC0uNTQtLjUzLS41M2gtLjg2YTEuMzcsMS4zNywwLDAsMC0xLjM4LDEuMzh2NC4zOGMwLC43Ni42MiwxLjM4LDEuMzgsMS4zOGgxLjM3VjIwLjUxaC0uNTMtLjU0WiIgZmlsbD0iIzAwOTNkMCIvPjxwYXRoIGQ9Ik0yMC43MywyMy40NnYxLjA5aC41M2ExLjM4LDEuMzgsMCwwLDAsMS4zOC0xLjM4di00LjM4YzAtLjc2LS42MS0xLjM4LTEuMzgtMS4zOGgtLjg2Yy0uMywwLS41My4yNC0uNTMuNTN2MS4wOWguNTN2Mi43M2gtLjUzWiIgZmlsbD0iIzAwYTJkMiIvPjxwYXRoIGQ9Im0yMS4yNiwxOS40M2gtLjg2YTEuMzcsMS4zNywwLDAsMC0xLjM4LDEuMzh2MS42M2gxLjA5VjIyaDEuMDl2LTEuNjNjMC0uNzYtLjYyLTEuMzgtMS4zOC0xLjM4aC0uNTNWMTkuOTdoLjg2YzAsMCwwLC41NCwwLC41NFYxOS40M1oiIGZpbGw9IiMwMDc5Y2MiLz48cGF0aCBkPSJNMjEuMjYsMTkuNDNoLS44NmExLjM4LDEuMzgsMCwwLDAtMS4zOCwxLjM4djQuMzhjMCwuNzYuNjIsMS4zOCwxLjM4LDEuMzhoMS4zN3YtMS4wOWgtLjUzVjIwLjUxaC41M3YtMS4wOWMwLS4zLS4yNC0uNTQtLjUzLS41NFoiIGZpbGw9IiMwMDc4Y2IiLz48cGF0aCBkPSJtMTkuNDksMTAuOTZ2LjU0YzAsLjI5LS4yNC41My0uNTMuNTN2Mi4xN2MwLC4zLS4yNC41NC0uNTQuNTRIOS42NmMtLjMsMC0uNTQtLjI0LS41NC0uNTN2LS41MmMwLS4zLS4yNC0uNTQtLjU0LS41NEg0LjEzYy0uMywwLS41NC0uMjQtLjU0LS41NHYtLjU0YzAtLjI5LC4yNC0uNTMsLjU0LS41M2g1LjkzYy4zLDAsLjU0LS4yNC41NC0uNTNWOS4xM2MwLS4zLC4yNC0uNTQsLjU0LS41NGg3LjI1YzAsLjI5LC4yNC41MywuNTQuNTN2MS4wOWgwWiIgZmlsbD0iI2YyYjYwMCIvPjxwYXRoIGQ9Im0xOC45NiwxMS40OXYyLjE3YzAsLjMtLjI0LjU0LS41NC41NEg5LjY2Yy0uMywwLS41NC0uMjQtLjU0LS41NFYxMi41YzAtLjI5LS4yNC0uNTMtLjU0LS41M0g0LjEzYy0uMywwLS41NC0uMjQtLjU0LS41NHYtLjU0YzAsLjMtLjI0LjU0LS41NC41NGgwYy0uMywwLS41NC0uMjQtLjU0LS41NFY5LjEyYzAtLjMsLjI0LS41MywuNTQtLjUzaDguMDVjLjI5LDAsLjUzLC4yNCwuNTMsLjUzdjEuMmMwLC4zLC4yNC41NCwuNTQuNTRIOS4xMXYtMS42M2g3LjI1YzAsLjI5LC4yNC41MywuNTQuNTN2MS4wOWgwWiIgZmlsbD0iI2ZmZTc5OCIvPjxwYXRoIGQ9Ik0zLjU0LDEzLjczYzAtLjI5LC4yNC0uNTMsLjU0LS41M2g0LjQzYy4yOSwwLC41My0uMjQuNTMtLjU0VjkuMTFjMC0uMy4yNC0uNTQuNTQtLjU0aDcuMjVjLjI5LDAsLjUzLjI0LC41My41M3YxLjA5YzAsLjI5LC4yNC41NCwuNTQuNTRoMS4wOXYtNC4zOGgtMS4wOXYtMS4wOWgtNy4yNWMwLDAsMC0uNTQsMC0uNTNoLS41NFYyLjU0SDkuMTFjLS4zLDAsLjU0LS4yNCwuNTQtLjU0SDMuNTNjLS4zLDAsLjU0LS4yNCwuNTQtLjU0djEwLjE0YzAsLjI5LS4yNC41NC0uNTQuNTNIMi40NmMwLDAsMCwuNTQsMCwuNTRoLjU0YzAsLjI5LDAsLjU0LDAsLjU0WiIgZmlsbD0iI2ZjMGUwMCIvPjxwYXRoIGQ9Ik04LjU5LDkuNjZWMzBIMy41NGMtLjMsMC0uNTMtLjI0LS41My0uNTQtLjg2LDAtLjg2LDAtLjg2LDBoLDBjLS4yOSwwLS41NC0uMjQtLjU0LS41NFY5LjEyYzAtLjMsLjI4LS41MywuNTQtLjUzSDguMDVWOS4xMmgwYzAtLjI5LjI0LS41My41NC0uNTNaIiBmaWxsPSIjZjJiNjAwIi8+PHBhdGggZD0iTTkuNjYsOS4xMnYxOS43MWgtMS4xVjkuMTJoMS4xWiIgZmlsbD0iI2ZmZTc5OCIvPjxwYXRoIGQ9Ik0yMy4zMywzMiwwLDMyLDAsMEgyMy4zM1oiIGZpbGw9Im5vbmUiLz48L3N2Zz4=" alt="MTN Mobile Money" style="height: 50px; margin-right: 15px;" />
-                        <img src="data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiPz4KPHN2ZyB3aWR0aD0iNzUycHQiIGhlaWdodD0iNzUycHQiIHZlcnNpb249IjEuMSIgdmlld0JveD0iMCAwIDc1MiA3NTIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CiA8cGF0aCBkPSJtMzc2LjQ3IDEwMi4zN2MtMTQ3LjAzIDAtMjY2LjM0IDExOS4zMS0yNjYuMzQgMjY2LjM0czExOS4zMSAyNjYuMzQgMjY2LjM0IDIYNi4zNGMxNDcuMDQgMCAyNjYuMzQtMTE5LjMxIDI2Ni4zNC0yNjYuMzRzLTExOS4zLTI2Ni4zNC0yNjYuMzQtMjY2LjM0em0xODguNjYgMjc3LjM3aC0xMjAuNDR2LTEwOS42MWMwLTMzLjAxOC0yNi43OTQtNTkuODExLTU5LjgxMS01OS44MTFoLTE3LjN2MTY5LjQySDIxMS43OHYtMjM4LjgyaDEyMC40NHYxMDkuNjFjMCAzMy4wMTggMjYuNzk0IDU5LjgxMSA1OS44MTEgNTkuODExaDE3LjN2LTE2OS40MmgxMjcuNDF6IiBmaWxsPSIjZjYwIi8+Cjwvc3ZnPgo=" alt="Orange Money" style="height: 50px;" />
+                        <img src="/Image/MOMO.jpeg" alt="MTN Mobile Money" style="height: 50px; margin-right: 15px;" />
+                        <img src="/Image/OrangeMoney.jpeg" alt="Orange Money" style="height: 50px;" />
                     </div>
                     <p class="payment-note">After clicking "Pay Now", you will be redirected to complete your purchase securely.</p>
                 </div>
             </div>
 
-            <button type="submit" class="pay-now-button">Pay Now</button>
+            <div class="payment-selection-section">
+                <h3>Choose Payment Method</h3>
+                <InputRadioGroup @bind-Value="checkoutModel.PaymentMethod">
+                    <div class="payment-options-container">
+                        <label class="radio-option">
+                            <InputRadio Value='"MTN"' />
+                            <img src="/Image/MOMO.jpeg" alt="MTN Mobile Money" style="height: 50px;" />
+                            <span>MTN Mobile Money</span>
+                        </label>
+                        <label class="radio-option">
+                            <InputRadio Value='"Orange"' />
+                            <img src="/Image/OrangeMoney.jpeg" alt="Orange Money" style="height: 50px;" />
+                            <span>Orange Money</span>
+                        </label>
+                    </div>
+                </InputRadioGroup>
+                <ValidationMessage For="@(() => checkoutModel.PaymentMethod)" />
+            </div>
+
+            <button type="submit" class="pay-now-button action-button">Pay Now</button>
+            <button type="button" class="pay-now-button action-button whatsapp-order-button" @onclick="OrderViaWhatsApp">Order via WhatsApp</button>
         </EditForm>
     </div>
 
@@ -88,7 +110,12 @@
                     <div>
                         <p>@item.Product.Name</p>
                         <p>FCFA @item.Product.Price.ToString("N0")</p>
-                        <p>Quantity: @item.Quantity</p>
+                        <div class="quantity-controls">
+                            <button type="button" @onclick="() => DecrementQuantity(item)">-</button>
+                            <span>@item.Quantity</span>
+                            <button type="button" @onclick="() => IncrementQuantity(item)">+</button>
+                            <button type="button" class="remove-button" @onclick="() => RemoveItem(item)">Remove</button>
+                        </div>
                     </div>
                 </div>
             }
@@ -128,11 +155,102 @@
         State.OnStateChange += StateHasChanged;
     }
 
-    private void HandleCheckout(EditContext context)
+    private async Task HandleCheckout()
     {
-        // For now, we'll just navigate to a confirmation page.
-        // In a real application, you would process the payment here.
+        var totalAmount = Subtotal + ShippingCost;
+        await JSRuntime.InvokeVoidAsync("alert", $"This is a simulation.\n\nRedirecting to {checkoutModel.PaymentMethod} Money to pay FCFA {totalAmount:N0}.\nIn a real app, you would enter your PIN to confirm.");
+
+        await SendPaymentNotificationToAdmin();
+
         NavigationManager.NavigateTo("/order-confirmation");
+    }
+
+    private async Task SendPaymentNotificationToAdmin()
+    {
+        var orderSummary = "";
+        var itemNumber = 1;
+        foreach (var item in State.Cart)
+        {
+            orderSummary += $"{itemNumber}. {item.Product.Name} (Qty: {item.Quantity})\n";
+            itemNumber++;
+        }
+
+        var total = Subtotal + ShippingCost;
+        var customerDetails = $"Name: {checkoutModel.FirstName} {checkoutModel.LastName}\n" +
+                              $"Phone: {checkoutModel.PhoneNumber}\n" +
+                              $"Town: {checkoutModel.TownCity}";
+
+        var adminPhoneNumber = "237671007313";
+        var message = $"SUCCESSFUL PAYMENT (SHIPPING)\n\n" +
+                      $"A payment of FCFA {total:N0} was just made via {checkoutModel.PaymentMethod} Money.\n\n" +
+                      $"--- Customer ---\n{customerDetails}\n\n" +
+                      $"--- Order ---\n{orderSummary}";
+
+        var encodedMessage = Uri.EscapeDataString(message);
+        var whatsappUrl = $"https://wa.me/{adminPhoneNumber}?text={encodedMessage}";
+
+        await JSRuntime.InvokeVoidAsync("open", whatsappUrl, "_blank");
+    }
+
+    private async Task IncrementQuantity(CartItem item)
+    {
+        await State.UpdateCartItemQuantity(item, item.Quantity + 1);
+    }
+
+    private async Task DecrementQuantity(CartItem item)
+    {
+        if (item.Quantity > 1)
+        {
+            await State.UpdateCartItemQuantity(item, item.Quantity - 1);
+        }
+    }
+
+    private async Task RemoveItem(CartItem item)
+    {
+        await State.RemoveFromCart(item);
+    }
+
+    private async Task OrderViaWhatsApp()
+    {
+        if (string.IsNullOrWhiteSpace(checkoutModel.FirstName) ||
+            string.IsNullOrWhiteSpace(checkoutModel.LastName) ||
+            string.IsNullOrWhiteSpace(checkoutModel.PhoneNumber) ||
+            string.IsNullOrWhiteSpace(checkoutModel.TownCity))
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Please fill in your Name, Phone Number, and Town before ordering via WhatsApp.");
+            return;
+        }
+
+        var orderSummary = "";
+        var itemNumber = 1;
+        foreach (var item in State.Cart)
+        {
+            orderSummary += $"{itemNumber}. {item.Product.Name} (Quantity: {item.Quantity}) - FCFA {item.Product.Price:N0}\n";
+            itemNumber++;
+        }
+
+        var subtotal = Subtotal;
+        var shippingCost = ShippingCost;
+        var total = subtotal + shippingCost;
+
+        orderSummary += $"\nSubtotal: FCFA {subtotal:N0}\n";
+        orderSummary += $"Shipping: FCFA {shippingCost:N0}\n";
+        orderSummary += $"Total: FCFA {total:N0}";
+
+        var customerDetails = $"Name: {checkoutModel.FirstName} {checkoutModel.LastName}\n" +
+                              $"Phone: {checkoutModel.PhoneNumber}\n";
+        if (!string.IsNullOrWhiteSpace(checkoutModel.Address1)) customerDetails += $"Address 1: {checkoutModel.Address1}\n";
+        if (!string.IsNullOrWhiteSpace(checkoutModel.Address2)) customerDetails += $"Address 2: {checkoutModel.Address2}\n";
+        if (!string.IsNullOrWhiteSpace(checkoutModel.Address3)) customerDetails += $"Address 3: {checkoutModel.Address3}\n";
+        customerDetails += $"Town/City: {checkoutModel.TownCity}\n";
+        if (!string.IsNullOrWhiteSpace(checkoutModel.Region)) customerDetails += $"Region: {checkoutModel.Region}\n";
+
+        var phoneNumber = "237671007313";
+        var message = $"Hello, I would like to place the following order for shipping:\n\n--- Customer Details ---\n{customerDetails}\n\n--- Order Summary ---\n{orderSummary}";
+        var encodedMessage = Uri.EscapeDataString(message);
+        var whatsappUrl = $"https://wa.me/{phoneNumber}?text={encodedMessage}";
+
+        NavigationManager.NavigateTo(whatsappUrl, forceLoad: true);
     }
 
     public void Dispose()

@@ -16,4 +16,6 @@ wwwroot\favicon.png
 wwwroot\Image\barca.jpeg
 wwwroot\Image\maisonlogo.jpg
 wwwroot\Image\masonhero.png
+wwwroot\Image\MOMO.jpeg
+wwwroot\Image\OrangeMoney.jpeg
 wwwroot\js\site.js
