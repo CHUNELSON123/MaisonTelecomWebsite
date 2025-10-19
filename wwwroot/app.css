@@ -134,6 +134,11 @@ html, body {
     cursor: pointer;
 }
 
+    .btn-shop-now:hover {
+        background-color: #1E40AF;
+        color: #fff;
+    }
+
 
 /* --- Responsive Styles (for screens 768px or less) --- */
 @media (max-width: 768px) {
@@ -165,3 +170,7 @@ html, body {
         font-size: 0.9rem;
     }
 }
+
+ 
+
+ 

@@ -2,10 +2,14 @@
 @rendermode InteractiveServer
 @using Microsoft.EntityFrameworkCore
 @using MaisonTelecom.Data
-@inject ApplicationDbContext dbContext
+@using MaisonTelecom.Services
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
 @inject IJSRuntime JSRuntime
+@inject StateContainer State
+@implements IDisposable
 
 <style>
+    /* Your existing styles remain unchanged */
     .spec-item {
         cursor: pointer;
         display: flex;
@@ -50,14 +54,14 @@
                 <span class="specs">@product.RAM RAM, @product.ROM ROM</span>
                 <span class="price">FCFA @product.Price.ToString("N0")</span>
                 <span class="condition">State: New</span>
-                
+
                 <div class="quantity">
                     <label for="quantity">Quantity:</label>
                     <input type="number" id="quantity" value="1" min="1" />
                 </div>
                 <div class="actions">
-                    <button class="add-to-card">Add to Card - FCFA @product.Price.ToString("N0")</button>
-                    <button class="add-to-wishlist"><i class="far fa-heart"></i> Add to Wishlist</button>
+                    <button class="add-to-card" @onclick="AddToCart">Add to Card - FCFA @product.Price.ToString("N0")</button>
+                    <button class="add-to-wishlist" @onclick="AddToWishlist"><i class="far fa-heart"></i> Add to Wishlist</button>
                     <button class="buy-now">Buy Now</button>
                 </div>
             </div>
@@ -160,26 +164,32 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        using var dbContext = await DbFactory.CreateDbContextAsync();
         product = await dbContext.Products.FindAsync(Id);
         if (product != null)
         {
             mainImageUrl = product.ImageURL1 ?? "/Image/barca.jpeg";
-            
+
             relatedProducts = await dbContext.Products
                 .Where(p => p.ProductCategory == product.ProductCategory && p.Id != product.Id)
                 .Take(4)
                 .ToListAsync();
         }
     }
-    
-    // This lifecycle method runs after the component has rendered
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
-            // Call the JavaScript function to scroll to the top
             await JSRuntime.InvokeVoidAsync("scrollToTop");
+            await State.InitializeAsync();
+            StateHasChanged();
         }
+    }
+    
+    protected override void OnInitialized()
+    {
+        State.OnStateChange += StateHasChanged;
     }
 
     private IEnumerable<string> GetImageUrls()
@@ -208,5 +218,26 @@
         return specs.Split(new[] { ',', '\n' }, StringSplitOptions.RemoveEmptyEntries)
                     .Select(s => s.Trim())
                     .ToArray();
+    }
+
+    private async Task AddToCart()
+    {
+        if (product != null)
+        {
+            await State.AddToCart(product);
+        }
+    }
+
+    private async Task AddToWishlist()
+    {
+        if (product != null)
+        {
+            await State.AddToWishlist(product);
+        }
+    }
+
+    public void Dispose()
+    {
+        State.OnStateChange -= StateHasChanged;
     }
 }

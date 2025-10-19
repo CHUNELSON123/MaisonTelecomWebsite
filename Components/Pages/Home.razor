@@ -138,8 +138,10 @@
     </div>
 </section>
 
-
 @code {
+    [Inject]
+    private IDbContextFactory<ApplicationDbContext> DbFactory { get; set; }
+
     private List<MaisonTelecom.Models.Product> TrendingProducts;
     private List<MaisonTelecom.Models.Product> LatestProducts;
     private List<MaisonTelecom.Models.Product> BrandProducts;
@@ -148,6 +150,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        using var dbContext = await DbFactory.CreateDbContextAsync();
         TrendingProducts = await dbContext.Products.Where(p => p.IsTrending).Take(9).ToListAsync();
         await LoadLatestProducts(selectedCategory);
         await LoadBrandProducts(selectedBrand);
@@ -155,12 +158,14 @@
 
     private async Task LoadLatestProducts(string category)
     {
+        using var dbContext = await DbFactory.CreateDbContextAsync();
         selectedCategory = category;
         LatestProducts = await dbContext.Products.Where(p => p.IsLatest && p.ProductCategory == category).Take(9).ToListAsync();
     }
 
     private async Task LoadBrandProducts(string brandName)
     {
+        using var dbContext = await DbFactory.CreateDbContextAsync();
         selectedBrand = brandName;
         BrandProducts = await dbContext.Products.Where(p => p.Brand == brandName).Take(9).ToListAsync();
     }

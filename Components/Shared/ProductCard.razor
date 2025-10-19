@@ -1,8 +1,6 @@
 ﻿@using MaisonTelecom.Services
 @inject StateContainer State
 
- 
-
 <div class="product-card-wrapper">
     <div class="product-image-container">
         <a href="/product/@Product.Id">
@@ -11,13 +9,13 @@
 
         <div class="card-actions">
             <div class="icon-container wishlist-icon">
-                <a @onclick="() => State.AddToWishlist(Product)" @onclick:preventDefault title="Add to Wishlist">
+                <a @onclick="() => AddToWishlist()" @onclick:preventDefault title="Add to Wishlist">
                     <i class="far fa-heart"></i>
                 </a>
                 <span class="tooltip-text">Add to Wishlist</span>
             </div>
             <div class="icon-container cart-icon">
-                <a @onclick="() => State.AddToCart(Product)" @onclick:preventDefault title="Add to Cart">
+                <a @onclick="() => AddToCart()" @onclick:preventDefault title="Add to Cart">
                     <i class="fas fa-shopping-cart"></i>
                 </a>
                 <span class="tooltip-text">Add to Cart</span>
@@ -39,4 +37,14 @@
 @code {
     [Parameter]
     public MaisonTelecom.Models.Product Product { get; set; }
+
+    private async Task AddToWishlist()
+    {
+        await State.AddToWishlist(Product);
+    }
+
+    private async Task AddToCart()
+    {
+        await State.AddToCart(Product);
+    }
 }

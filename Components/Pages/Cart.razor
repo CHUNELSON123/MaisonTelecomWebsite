@@ -3,12 +3,13 @@
 @using MaisonTelecom.Services
 @using MaisonTelecom.Models
 @inject StateContainer State
+@inject NavigationManager NavigationManager
 @implements IDisposable
 
 <div class="cart-page">
     <div class="cart-header">
         <h1>Your Cart</h1>
-        <a href="/shop" class="continue-shopping">Continue Shopping</a>
+        <a href="/shop"><button class="continue-shopping">Continue Shopping</button></a>
     </div>
 
     <div class="cart-items">
@@ -50,7 +51,7 @@
             <p>Subtotal</p>
             <p>FCFA @Subtotal.ToString("N0")</p>
         </div>
-        <button class="checkout-button">
+        <button class="checkout-button" @onclick='() => NavigationManager.NavigateTo("/checkout-shipping")'>
             <i class="fas fa-lock"></i>
             Check Out
         </button>
@@ -58,7 +59,16 @@
 </div>
 
 @code {
-    private decimal Subtotal => State.Cart.Sum(item => item.Product.Price * item.Quantity);
+    private decimal Subtotal => State.Cart.Any() ? State.Cart.Sum(item => item.Product.Price * item.Quantity) : 0;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await State.InitializeAsync();
+            StateHasChanged();
+        }
+    }
 
     protected override void OnInitialized()
     {

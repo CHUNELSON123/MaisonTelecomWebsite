@@ -1,15 +1,20 @@
-# See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
-
-# dependencies
-/bin
-/obj
-
-# user-specific files
+# Visual Studio / .NET Core specific
+.vs/
+*.suo
 *.user
 *.userosscache
 *.sln.docstates
 
-# build results
-[Bb]uild/
-[Dd]ebug/
-[Rr]elease/
+# Build results
+[Bb]in/
+[Oo]bj/
+
+# Rider files
+.idea/
+
+# User-specific files
+appsettings.Development.json
+
+# Other
+*.db
+*.pdb

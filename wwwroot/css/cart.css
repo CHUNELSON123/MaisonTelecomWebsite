@@ -17,7 +17,9 @@
     }
 
 .continue-shopping {
-    background: none;
+    background-color: #fff;
+    color: #000;
+    border-radius: 5px;
     border: 1px solid #ccc;
     padding: 0.5rem 1rem;
     cursor: pointer;
@@ -26,9 +28,10 @@
 .cart-item {
     display: flex;
     align-items: center;
-    border: 1px solid #e0e0e0;
+    border: 1px solid #ccc;
     margin-bottom: 1rem;
     padding: 1rem;
+    border-radius: 10px;
 }
 
 .item-image {
@@ -46,7 +49,7 @@
         margin: 0;
     }
 
-.item-brand {
+.item-price, .item-name {
     font-weight: bold;
 }
 
@@ -76,7 +79,7 @@
     }
 
 .remove-link {
-    color: #888;
+    color: red;
     text-decoration: none;
 }
 
@@ -92,7 +95,7 @@
 }
 
 .subtotal {
-    border: 1px solid #e0e0e0;
+    border: 1px solid #ccc;
     padding: 1.5rem;
     text-align: center;
     margin-right: 1rem;
@@ -104,7 +107,9 @@
 
 .checkout-button {
     background-color: #fff;
-    border: 2px solid #000;
+    color: #000;
+    border: 1px solid #ccc;
+    border-radius: 10px;
     padding: 1.5rem 2rem;
     font-size: 1rem;
     cursor: pointer;
@@ -112,6 +117,9 @@
     align-items: center;
 }
 
+    .checkout-button:hover {
+        background-color: #1E40AF;
+    }
     .checkout-button .fa-lock {
         margin-right: 0.5rem;
     }

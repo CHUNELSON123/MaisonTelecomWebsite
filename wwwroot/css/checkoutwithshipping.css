@@ -21,19 +21,21 @@
 
 .delivery-options {
     display: flex;
+    gap: 1rem;
 }
 
 .radio-option {
     border: 1px solid #ccc;
     padding: 1rem;
-    margin-right: 1rem;
     cursor: pointer;
     display: flex;
     align-items: center;
+    width: 48%; /* This will match the width of the First Name field */
+    justify-content: space-between;
 }
 
     .radio-option.active {
-        border-color: #007bff;
+        border-color: #1E40AF;
     }
 
     .radio-option input[type="radio"] {
@@ -75,12 +77,16 @@
 .pay-now-button {
     width: 100%;
     padding: 1rem;
-    border: 1px solid #000;
+    border: 1px solid #ccc;
     background-color: #fff;
+    color: #000;
     font-size: 1.1rem;
     cursor: pointer;
+    border-radius: 5px;
 }
-
+    .pay-now-button:hover {
+        background-color: #1E40AF;
+    }
 .order-summary {
     width: 35%;
     border-left: 1px solid #e0e0e0;
@@ -145,4 +151,15 @@
         .form-row input, .form-row select {
             width: 100%;
         }
+}
+
+.radio-option div {
+    display: flex;
+    align-items: center;
+}
+
+.radio-option i {
+    font-size: 1.2rem;
+    color: #1E40AF;
+    
 }

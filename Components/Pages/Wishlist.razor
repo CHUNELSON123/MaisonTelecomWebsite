@@ -1,6 +1,7 @@
 ﻿@page "/wishlist"
 @rendermode InteractiveServer
 @using MaisonTelecom.Services
+@using MaisonTelecom.Models
 @inject StateContainer State
 @implements IDisposable
 
@@ -25,7 +26,6 @@
                         <p class="item-state">State: New</p>
                     </div>
                     <div class="item-actions">
-                        
                         <div class="action-buttons">
                             <button class="buy-now">Buy Now</button>
                             <button class="add-to-cart" @onclick="() => MoveToCart(item)">Add to Cart</button>
@@ -43,15 +43,24 @@
 </div>
 
 @code {
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await State.InitializeAsync();
+            StateHasChanged();
+        }
+    }
+
     protected override void OnInitialized()
     {
         State.OnStateChange += StateHasChanged;
     }
 
-    private void MoveToCart(MaisonTelecom.Models.Product product)
+    private async Task MoveToCart(MaisonTelecom.Models.Product product)
     {
-        State.AddToCart(product);
-        State.RemoveFromWishlist(product);
+        await State.AddToCart(product);
+        await State.RemoveFromWishlist(product);
     }
 
     public void Dispose()

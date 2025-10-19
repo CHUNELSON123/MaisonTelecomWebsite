@@ -43,13 +43,13 @@
 }
 
     .category-filters button:hover {
-        background-color: #f0f0f0;
+        background-color: #1E40AF;
     }
 
     .category-filters button.active {
-        background-color: #002366;
+        background-color: #1E40AF;
         color: #fff;
-        border-color: #333;
+        border-color: #1E40AF;
     }
 
 .product-grid {
