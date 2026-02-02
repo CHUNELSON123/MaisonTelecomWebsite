@@ -1,0 +1,134 @@
+﻿@page "/admin/services/edit/{Id:int}"
+@using MaisonTelecom.Models
+@using MaisonTelecom.Data
+@using Microsoft.EntityFrameworkCore
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject NavigationManager NavigationManager
+@layout MaisonTelecom.Components.Layout.AdminLayout
+@rendermode InteractiveServer
+
+<div class="admin-page-container">
+    <h1 class="admin-page-title">Edit Service</h1>
+
+    <div class="admin-content-box">
+        <div class="admin-content-header">
+            <h2>Update Details</h2>
+            <a href="/admin/services" class="back-button">Back to List</a>
+        </div>
+
+        <div class="admin-form-container">
+            @if (ServiceToEdit == null)
+            {
+                <p>Loading...</p>
+            }
+            else
+            {
+                <EditForm Model="ServiceToEdit" OnValidSubmit="HandleUpdateService">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
+
+                    @* Name *@
+                    <div class="form-group">
+                        <label>Service Name:</label>
+                        <InputText @bind-Value="ServiceToEdit.Name" class="form-control" />
+                    </div>
+
+                    @* Description *@
+                    <div class="form-group">
+                        <label>Short Description:</label>
+                        <InputTextArea @bind-Value="ServiceToEdit.BasicSpecs" class="form-control" rows="2" />
+                    </div>
+
+                    @* Features *@
+                    <div class="form-group">
+                        <label>Key Features:</label>
+                        <InputTextArea @bind-Value="ServiceToEdit.SpecialFeatures" class="form-control" rows="4" />
+                    </div>
+
+                    @* Icon *@
+                    <div class="form-group">
+                        <label>Icon Class:</label>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <InputText @bind-Value="ServiceToEdit.IconClass" class="form-control" />
+                            <div style="font-size: 1.5rem; width: 40px; text-align: center; color: #007bff;">
+                                <i class="@(ServiceToEdit.IconClass ?? "fas fa-wrench")"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* Popularity *@
+                    <div class="form-group">
+                        <label>
+                            <InputCheckbox @bind-Value="ServiceToEdit.IsTrending" /> Mark as Popular
+                        </label>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="saved-button">Update Service</button>
+                    </div>
+                </EditForm>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+    }
+
+    .saved-button {
+        background-color: #007bff;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        width: 100%;
+    }
+
+        .saved-button:hover {
+            background-color: #0056b3;
+        }
+</style>
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private Product? ServiceToEdit { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        using var context = DbFactory.CreateDbContext();
+        ServiceToEdit = await context.Products.FindAsync(Id);
+    }
+
+    private async Task HandleUpdateService()
+    {
+        if (ServiceToEdit != null)
+        {
+            using var context = DbFactory.CreateDbContext();
+
+            // Ensure data integrity remains correct
+            ServiceToEdit.ProductCategory = "Software";
+
+            context.Products.Update(ServiceToEdit);
+            await context.SaveChangesAsync();
+
+            NavigationManager.NavigateTo("/admin/services");
+        }
+    }
+}

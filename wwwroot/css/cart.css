@@ -1,4 +1,5 @@
-﻿.cart-page {
+﻿/* wwwroot/css/cart.css */
+.cart-page {
     padding: 2rem;
     max-width: 1200px;
     margin: 0 auto;
@@ -120,38 +121,125 @@
     .checkout-button:hover {
         background-color: #1E40AF;
     }
+
     .checkout-button .fa-lock {
         margin-right: 0.5rem;
     }
 
-/* Responsive Styles */
+/* ========================================= */
+/* MOBILE VIEW: Grid Layout (No Overlap)     */
+/* ========================================= */
 @media (max-width: 768px) {
     .cart-page {
-        padding: 1rem;
+        padding: 10px;
+        padding-bottom: 100px; /* Space for sticky checkout */
     }
 
     .cart-header {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .cart-item {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .item-image {
-        width: 100%;
-        height: auto;
-        margin-right: 0;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 10px;
         margin-bottom: 1rem;
     }
 
-    .item-actions {
-        margin: 1rem 0 0 0;
-        width: 100%;
+        .cart-header h1 {
+            font-size: 1.5rem;
+        }
+
+    .cart-item {
+        display: grid;
+        /* COLUMNS: Auto (fits Quantity buttons) | 1fr (Rest of space) */
+        grid-template-columns: auto 1fr;
+        /* ROWS: Top (Image/Details) | Gap | Bottom (Qty/Price) */
+        grid-template-rows: auto 15px auto;
+        gap: 0 15px; /* Column gap ensures horizontal separation */
+        align-items: start;
+        padding: 15px;
+        position: relative;
+        background: #fff;
+        border: 1px solid #f0f0f0;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.03);
     }
 
+    /* 1. Image: Top Left */
+    .item-image {
+        width: 80px;
+        height: 80px;
+        margin: 0;
+        grid-row: 1 / 2;
+        grid-column: 1 / 2;
+        border-radius: 6px;
+    }
+
+    /* 2. Details: Top Right */
+    .item-details {
+        grid-row: 1 / 2;
+        grid-column: 2 / 3;
+        padding-right: 25px; /* Space for 'Remove' X button */
+        margin: 0;
+    }
+
+        .item-details .item-name {
+            font-size: 0.95rem;
+            line-height: 1.3;
+            margin-bottom: 4px;
+            display: block;
+            color: #333;
+        }
+
+        .item-details p {
+            font-size: 0.8rem;
+            color: #777;
+        }
+
+    /* 3. Remove Button: Absolute Top Right */
+    .remove-link {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        font-size: 1rem;
+        color: #999;
+        padding: 5px;
+    }
+
+    /* 4. Quantity Selector: Bottom LEFT */
+    .item-actions {
+        grid-row: 3 / 4;
+        grid-column: 1 / 2; /* Strict Left Column */
+        margin: 0;
+        width: auto;
+        justify-self: start;
+    }
+
+    .quantity-selector {
+        margin: 0;
+        background: #f9f9f9;
+        border-radius: 4px;
+        border: 1px solid #eee;
+    }
+
+        .quantity-selector button {
+            padding: 5px 10px;
+            font-size: 1.1rem;
+            color: #1E40AF;
+        }
+
+    /* 5. Total Price: Bottom RIGHT */
+    .item-total-price {
+        grid-row: 3 / 4;
+        grid-column: 2 / 3; /* Strict Right Column */
+        /* FIX: Reset position so it respects the grid */
+        position: static !important;
+        justify-self: end; /* Push to far right */
+        align-self: center; /* Vertically align with buttons */
+        margin: 0;
+        font-size: 1.1rem;
+        color: #000;
+        text-align: right;
+        white-space: nowrap; /* Prevent wrapping if possible */
+    }
+
+    /* Summary Section */
     .cart-summary {
         flex-direction: column;
         align-items: stretch;
@@ -160,10 +248,25 @@
     .subtotal {
         margin-right: 0;
         margin-bottom: 1rem;
+        width: 100%;
+        background: #f9f9f9;
+        border: none;
+        border-radius: 8px;
     }
 
     .checkout-button {
         width: 100%;
         justify-content: center;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        border-radius: 0;
+        z-index: 100;
+        padding: 15px;
+        box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+        background-color: #1E40AF;
+        color: white;
+        border: none;
     }
 }

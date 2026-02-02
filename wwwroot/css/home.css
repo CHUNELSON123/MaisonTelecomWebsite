@@ -1,6 +1,4 @@
-﻿/* --- Replace the existing styles from Product Section downwards --- */
-
-/* Product Section */
+﻿/* Product Section Layout */
 .product-section {
     padding: 40px 0;
 }
@@ -9,96 +7,135 @@
         font-weight: bold;
         margin-bottom: 20px;
         font-size: 24px;
+        padding-left: 5px;
     }
 
 .product-carousel {
     display: grid;
-    /* Mobile First: 2 columns by default with a larger gap */
-    grid-template-columns: repeat(2, 1fr);
-    gap: 25px; /* Increased the gap for more space */
+    grid-template-columns: repeat(3, 1fr); /* Desktop: 3 Columns */
+    gap: 20px;
 }
 
-.product-card {
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    overflow: hidden;
-    text-align: left;
-    background-color: #fff;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    transition: transform 0.2s;
+/* ========================================= */
+/* MOBILE HOME: Edge-to-Edge with Light Blue Borders */
+/* ========================================= */
+@media (max-width: 767px) {
+
+    /* 1. FORCE BOOTSTRAP CONTAINER TO BE FULL WIDTH */
+    .container {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        max-width: 100% !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        width: 100% !important;
+        overflow-x: hidden;
+    }
+
+    /* 2. GRID LAYOUT */
+    .product-carousel {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        /* CHANGED: White background instead of grey */
+        background-color: #fff !important;
+        /* CHANGED: Gap allows the borders to be seen clearly */
+        gap: 5px !important;
+        padding: 5px !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+
+    /* 3. Adjust Heading formatting */
+    .product-section h2 {
+        padding-left: 15px;
+        margin-bottom: 10px;
+        font-size: 1.2rem;
+        border-left: 4px solid #1E40AF;
+        margin-left: 0;
+        margin-top: 15px;
+        background-color: #fff;
+        padding-top: 10px;
+        padding-bottom: 5px;
+    }
+
+    /* 4. Category Filters */
+    .category-filters {
+        padding-left: 10px;
+        margin-bottom: 10px;
+        display: flex;
+        overflow-x: auto;
+        white-space: nowrap;
+        padding-bottom: 10px;
+        scrollbar-width: none;
+        background-color: #fff;
+    }
+
+        .category-filters::-webkit-scrollbar {
+            display: none;
+        }
+
+        .category-filters .btn {
+            padding: 6px 15px !important;
+            font-size: 13px !important;
+        }
+
+    /* 5. CARD STYLING (Mobile Only) */
+    .product-carousel .product-card-wrapper {
+        /* CHANGED: Added Light Blue Border */
+        border: 1px solid #dbeafe !important;
+        border-radius: 4px !important;
+        box-shadow: none !important;
+    }
 }
 
-    .product-card img {
-        width: 100%;
-        height: auto;
-        display: block;
-    }
-
-.product-info {
-    padding: 15px;
-}
-
-    .product-info .brand {
-        font-size: 14px;
-        color: #888;
-        display: block;
-        margin-bottom: 5px;
-    }
-
-    .product-info h5 {
-        margin: 0;
-        font-weight: bold;
-        font-size: 16px;
-    }
-
-.product-info .specs,
-.product-info .condition {
-    font-size: 12px;
-    color: #555;
-    display: block;
-    margin-bottom: 5px;
-}
-    .product-info .price {
-        font-weight: bold;
-        color: #333;
-        font-size: 18px;
-        margin-top: 10px;
-        display: block;
-    }
-
-/* Category Filters */
+/* Category Filters (Desktop) */
 .category-filters .btn {
     background-color: #f0f0f0;
-    border: none;
+    border: 1px solid #ddd;
     margin-right: 10px;
     border-radius: 20px;
     padding: 8px 20px;
     font-size: 14px;
     font-weight: 500;
     cursor: pointer;
+    transition: all 0.3s;
 }
+
+    .category-filters .btn:hover {
+        background-color: #e0e0e0;
+    }
 
     .category-filters .btn.active {
         background-color: #1E40AF;
         color: white;
+        border-color: #1E40AF;
     }
 
-/* Reviews Section */
+/* --- Reviews Section --- */
 .reviews-section {
     padding: 40px 0;
+    background-color: #f9f9f9;
 }
 
     .reviews-section h2 {
         font-weight: bold;
         margin-bottom: 20px;
         font-size: 24px;
+        padding-left: 5px;
     }
 
 .reviews-carousel {
     display: grid;
-    /* Mobile First: 2 columns for reviews */
-    grid-template-columns: repeat(2, 1fr);
-    gap: 25px; /* Increased the gap */
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+@media (max-width: 767px) {
+    .reviews-carousel {
+        grid-template-columns: 1fr !important;
+        gap: 15px !important;
+        padding: 0 15px !important;
+    }
 }
 
 .review-card {
@@ -106,6 +143,7 @@
     border-radius: 8px;
     padding: 20px;
     background-color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
 }
 
 .reviewer {
@@ -119,6 +157,7 @@
         height: 40px;
         border-radius: 50%;
         margin-right: 10px;
+        object-fit: cover;
     }
 
     .reviewer span {
@@ -126,22 +165,13 @@
         font-size: 14px;
     }
 
-/* Media Query for Desktop */
-@media (min-width: 992px) {
-    .product-carousel,
-    .reviews-carousel {
-        /* 3 columns for both carousels on desktop */
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
 /* Footer */
 .app-footer {
     text-align: center;
     padding: 40px 20px;
     background-color: #ffffff;
     border-top: 1px solid #e0e0e0;
-    margin-top: 40px; /* Adds space above the footer */
+    margin-top: 0;
 }
 
 .social-icons a {
@@ -152,7 +182,7 @@
 }
 
     .social-icons a:hover {
-        color: #002366; /* Dark Blue on hover */
+        color: #002366;
     }
 
 .footer-links {
@@ -176,6 +206,6 @@
     margin-top: 10px;
 }
 
-.logo span{
+.logo span {
     color: black;
 }

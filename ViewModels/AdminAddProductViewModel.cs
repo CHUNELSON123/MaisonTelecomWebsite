@@ -1,5 +1,4 @@
-﻿// MaisonTelecom/ViewModels/AdminAddProductViewModel.cs
-using MaisonTelecom.Models;
+﻿using MaisonTelecom.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace MaisonTelecom.ViewModels
@@ -9,20 +8,19 @@ namespace MaisonTelecom.ViewModels
         [Required]
         public string Name { get; set; }
 
+        // These will store the selected value
         public string Brand { get; set; }
-        public string ProductCategory { get; set; } // New Property
-
-        [Required]
-        [Range(0.01, double.MaxValue, ErrorMessage = "Price must be greater than 0")]
-        public decimal Price { get; set; }
-
+        public string ProductCategory { get; set; }
         public string RAM { get; set; }
         public string ROM { get; set; }
         public string Processor { get; set; }
         public string Display { get; set; }
 
         [Required]
-        [Range(0, int.MaxValue, ErrorMessage = "Stock must be a positive number")]
+        public decimal Price { get; set; }
+        public decimal? PromoPrice { get; set; }
+
+        [Required]
         public int StockQuantity { get; set; }
 
         public string BasicSpecs { get; set; }
@@ -37,14 +35,15 @@ namespace MaisonTelecom.ViewModels
 
         public bool IsTrending { get; set; }
         public bool IsLatest { get; set; }
+        public ProductType Type { get; set; } = ProductType.Physical;
 
-        // Options for Dropdowns
-        public List<string> BrandOptions { get; set; } = new List<string> { "Apple", "Samsung", "Google", "OnePlus" };
-        public List<string> CategoryOptions { get; set; } = new List<string> { "Phones", "Laptops", "Accessories" };
-        public List<string> RAMOptions { get; set; } = new List<string> { "4GB", "6GB", "8GB", "12GB", "16GB" };
-        public List<string> ROMOptions { get; set; } = new List<string> { "64GB", "128GB", "256GB", "512GB", "1TB" };
-        public List<string> ProcessorOptions { get; set; } = new List<string> { "Snapdragon", "A15 Bionic", "Tensor", "Dimensity" };
-        public List<string> DisplayOptions { get; set; } = new List<string> { "AMOLED", "OLED", "LCD", "Retina" };
+        // --- EMPTY LISTS (Populated by DB) ---
+        public List<string> BrandOptions { get; set; } = new();
+        public List<string> CategoryOptions { get; set; } = new();
+        public List<string> RAMOptions { get; set; } = new();
+        public List<string> ROMOptions { get; set; } = new();
+        public List<string> ProcessorOptions { get; set; } = new();
+        public List<string> DisplayOptions { get; set; } = new();
 
         public Product ToProduct()
         {
@@ -54,6 +53,7 @@ namespace MaisonTelecom.ViewModels
                 Brand = this.Brand,
                 ProductCategory = this.ProductCategory,
                 Price = this.Price,
+                PromoPrice = this.PromoPrice,
                 RAM = this.RAM,
                 ROM = this.ROM,
                 Processor = this.Processor,

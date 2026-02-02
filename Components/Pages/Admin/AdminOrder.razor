@@ -1,0 +1,137 @@
+﻿@page "/admin/orders"
+@layout MaisonTelecom.Components.Layout.AdminLayout
+
+@using MaisonTelecom.Data
+@using MaisonTelecom.Models
+@using Microsoft.EntityFrameworkCore
+@* CHANGE: Inject the Factory, not the Context directly, to prevent connection crashes *@
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+
+<div class="admin-page-container">
+    <h1 class="admin-page-title">Order</h1>
+    <div class="admin-content-box">
+        <div class="admin-content-header">
+            <h2>Order List</h2>
+        </div>
+        <div class="admin-table-container">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>S/N</th>
+                        <th>Date & Time</th>
+                        <th>Customer Name</th>
+                        <th>Products</th>
+                        <th>Price</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (pagedOrders == null)
+                    {
+                        <tr><td colspan="6">Loading orders...</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var (order, index) in pagedOrders.Select((value, i) => (value, i)))
+                        {
+                            <tr>
+                                <td>@((index + 1) + (currentPage - 1) * pageSize)</td>
+                                <td>@order.OrderDate.ToString("g")</td>
+
+                                @* --- FIX IS HERE: Check if Customer is null --- *@
+                                <td>
+                                    @if (order.Customer != null)
+                                    {
+                                        @($"{order.Customer.FirstName} {order.Customer.LastName}")
+                                    }
+                                    else
+                                    {
+                                        @* Fallback to the manual CustomerName field for Guests *@
+                                        @(string.IsNullOrEmpty(order.CustomerName) ? "Guest" : order.CustomerName)
+                                    }
+                                </td>
+
+                                <td>@order.OrderItems.Count()</td>
+                                <td>FCFA @order.TotalPrice.ToString("N0")</td>
+                                <td><a href="/admin/order/@order.Id" class="view-button">View</a></td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="admin-pagination">
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                int pageNum = i;
+                <span class="@(currentPage == pageNum ? "active" : "")" @onclick="() => GoToPage(pageNum)">
+                    @GetCircledNumber(pageNum)
+                </span>
+            }
+
+            @if (currentPage < totalPages)
+            {
+                <span @onclick="() => GoToPage(currentPage + 1)">Next →</span>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    private List<Order> pagedOrders;
+    private int currentPage = 1;
+    private int pageSize = 20;
+    private int totalOrders;
+    private int totalPages;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // CREATE A NEW CONTEXT FOR THIS OPERATION
+        using var context = DbFactory.CreateDbContext();
+
+        totalOrders = await context.Orders.CountAsync();
+        totalPages = (int)Math.Ceiling(totalOrders / (double)pageSize);
+
+        await LoadPageData();
+    }
+
+    private async Task LoadPageData()
+    {
+        // CREATE A NEW CONTEXT FOR THIS OPERATION
+        using var context = DbFactory.CreateDbContext();
+
+        pagedOrders = await context.Orders
+                                .Include(o => o.Customer)
+                                .Include(o => o.OrderItems)
+                                .OrderByDescending(o => o.OrderDate)
+                                .Skip((currentPage - 1) * pageSize)
+                                .Take(pageSize)
+                                .ToListAsync();
+    }
+
+    private async Task GoToPage(int page)
+    {
+        if (page < 1 || page > totalPages || page == currentPage) return;
+        currentPage = page;
+        await LoadPageData();
+    }
+
+    private string GetCircledNumber(int num)
+    {
+        return num switch
+        {
+            1 => "①",
+            2 => "②",
+            3 => "③",
+            4 => "④",
+            5 => "⑤",
+            6 => "⑥",
+            7 => "⑦",
+            8 => "⑧",
+            9 => "⑨",
+            10 => "⑩",
+            _ => num.ToString()
+        };
+    }
+}

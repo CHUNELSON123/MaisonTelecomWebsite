@@ -1,21 +1,331 @@
-﻿<header class="top-header">
+﻿@using Microsoft.AspNetCore.Components.Routing
+@using Microsoft.AspNetCore.Components.Authorization
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+@implements IDisposable
+
+<header class="top-header">
     <div class="container-fluid">
         <nav class="navbar">
             <div class="logo">
-                <a class="navbar-brand" href="#">
+                <a class="navbar-brand" href="/">
                     <img src="/Image/maisonlogo.jpg" alt="Mason Telecom" />
-                    <span>Mason Telecom</span>
+                    <span>Maison Telecom</span>
                 </a>
             </div>
-            <div class="search-bar">
-                <input type="text" placeholder="Search" />
-                <button type="submit"><i class="fas fa-search"></i></button>
+
+            @* --- DESKTOP SEARCH BAR --- *@
+            <div class="search-bar d-none d-md-flex">
+                <input type="text"
+                       placeholder="Search Name, Brand..."
+                       value="@searchTerm"
+                       @oninput="OnSearchInput" />
+                <button type="button" @onclick="TriggerSearch"><i class="fas fa-search"></i></button>
             </div>
+
+            @* --- DESKTOP NAVIGATION LINKS --- *@
+            <div class="desktop-nav d-none d-md-flex">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/services" class="nav-link">Services</a>
+                <a href="/check-status" class="nav-link">Check Status</a>
+
+                @* --- ADMIN PANEL LINK (Desktop) --- *@
+                <AuthorizeView>
+                    <Authorized>
+                        <a href="/admin/dashboard" class="nav-link" style="color: #ffc107; font-weight: bold;">
+                            <i class="fas fa-lock" style="font-size: 0.8em; margin-right: 4px;"></i> Admin
+                        </a>
+                    </Authorized>
+                </AuthorizeView>
+            </div>
+
             <div class="user-icons">
-                <a href="/"><i class=""></i>HOME</a>
-                @* <a href="#"><i class=""></i>SHOP</a> *@
-                <a href="/wishlist"><i class="fa-regular fa-heart"></i></a>      <a href="/cart"><i class="fa-solid fa-cart-shopping"></i></a>
+                @* --- MOBILE SEARCH ICON --- *@
+                <a class="d-md-none pointer-cursor" @onclick="ToggleMobileSearch" style="margin-right: 15px;">
+                    <i class="fas fa-search"></i>
+                </a>
+
+                @* --- CART & WISHLIST (Hidden on mobile via 'd-none d-md-inline') --- *@
+                <a href="/wishlist" class="d-none d-md-inline"><i class="fa-regular fa-heart"></i></a>
+                <a href="/cart" class="d-none d-md-inline"><i class="fa-solid fa-cart-shopping"></i></a>
+
+                @* --- MOBILE HAMBURGER MENU --- *@
+                <button class="d-md-none hamburger-btn" @onclick="ToggleMobileMenu">
+                    <i class="fas fa-bars"></i>
+                </button>
             </div>
         </nav>
+
+        @* --- CLICK OUTSIDE BACKDROP --- *@
+        @if (showMobileMenu || showMobileSearch)
+        {
+            <div class="nav-overlay" @onclick="CloseOverlays"></div>
+        }
+
+        @* --- MOBILE SEARCH DROPDOWN --- *@
+        @if (showMobileSearch)
+        {
+            <div class="mobile-search-dropdown d-md-none">
+                <div class="input-group">
+                    <input type="text"
+                           class="form-control"
+                           placeholder="Search products..."
+                           value="@searchTerm"
+                           @oninput="OnSearchInput"
+                           autofocus />
+
+                    <button class="btn btn-primary" @onclick="TriggerSearch">
+                        <i class="fas fa-search"></i>
+                    </button>
+
+                    <button class="btn btn-danger" @onclick="ClearAndCloseSearch">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+        }
+
+        @* --- MOBILE NAVIGATION MENU --- *@
+        @if (showMobileMenu)
+        {
+            <div class="mobile-nav-dropdown d-md-none">
+                <a href="/" @onclick="CloseMobileMenu">
+                    <i class="fas fa-home"></i> Home
+                </a>
+                <a href="/shop" @onclick="CloseMobileMenu">
+                    <i class="fas fa-store"></i> Shop
+                </a>
+                <a href="/services" @onclick="CloseMobileMenu">
+                    <i class="fas fa-tools"></i> Services
+                </a>
+                <a href="/check-status" @onclick="CloseMobileMenu">
+                    <i class="fas fa-clipboard-check"></i> Check Repair Status
+                </a>
+
+                @* --- ADMIN PANEL LINK (Mobile) --- *@
+                <AuthorizeView>
+                    <Authorized>
+                        <a href="/admin/dashboard" @onclick="CloseMobileMenu" style="color: #dfa800; font-weight: bold; background-color: #fff9e6;">
+                            <i class="fas fa-lock"></i> Admin Panel
+                        </a>
+                    </Authorized>
+                </AuthorizeView>
+
+                @* --- Wishlist & Cart inside the menu --- *@
+                <a href="/wishlist" @onclick="CloseMobileMenu">
+                    <i class="fa-regular fa-heart"></i> My Wishlist
+                </a>
+                <a href="/cart" @onclick="CloseMobileMenu">
+                    <i class="fa-solid fa-cart-shopping"></i> My Cart
+                </a>
+            </div>
+        }
     </div>
 </header>
+
+<style>
+    .top-header {
+        position: relative;
+        z-index: 1020;
+    }
+
+    .pointer-cursor {
+        cursor: pointer;
+    }
+
+    .navbar {
+        flex-wrap: nowrap !important;
+    }
+
+    /* --- Adjust logo size on very small screens --- */
+    @@media (max-width: 380px) {
+        .logo span {
+            font-size: 16px;
+        }
+
+        .logo img {
+            height: 35px;
+        }
+    }
+
+    /* --- Backdrop Overlay --- */
+    .nav-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0,0,0,0.3); /* Darkens the background */
+        z-index: 999; /* Below the menu (1010) but above content */
+    }
+
+    /* Ensure menus sit above the overlay */
+    .mobile-nav-dropdown, .mobile-search-dropdown {
+        z-index: 1010 !important;
+    }
+
+    /* --- Desktop Navigation Styles --- */
+    .desktop-nav {
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        margin: 0 20px;
+    }
+
+        .desktop-nav .nav-link {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            padding: 5px 0;
+            transition: opacity 0.2s;
+            border-bottom: 2px solid transparent;
+        }
+
+            .desktop-nav .nav-link:hover {
+                opacity: 0.9;
+                border-bottom: 2px solid rgba(255,255,255,0.5);
+            }
+
+    /* --- Hamburger Menu Button --- */
+    .hamburger-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 20px;
+        margin-left: 15px;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    /* --- Mobile Menu Dropdown --- */
+    .mobile-nav-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: white;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        border-top: 1px solid #eee;
+        z-index: 1010;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .mobile-nav-dropdown a {
+            padding: 15px 20px;
+            color: #333;
+            text-decoration: none;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 16px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+            .mobile-nav-dropdown a:hover {
+                background-color: #f8f9fa;
+                color: #1E40AF;
+            }
+
+        .mobile-nav-dropdown i {
+            width: 20px;
+            text-align: center;
+            color: #666;
+        }
+
+    /* --- Mobile Search Dropdown --- */
+    .mobile-search-dropdown {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        width: 100%;
+        background-color: #f8f9fa;
+        padding: 10px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        z-index: 1000;
+        border-top: 1px solid #eee;
+    }
+
+        .mobile-search-dropdown input {
+            border: 1px solid #ccc;
+            border-radius: 4px 0 0 4px;
+        }
+
+        .mobile-search-dropdown button {
+            border-radius: 0;
+        }
+
+            .mobile-search-dropdown button:last-child {
+                border-radius: 0 4px 4px 0;
+            }
+</style>
+
+@code {
+    private string searchTerm = "";
+    private bool showMobileSearch = false;
+    private bool showMobileMenu = false;
+    private System.Timers.Timer? _debounceTimer;
+
+    protected override void OnInitialized()
+    {
+        _debounceTimer = new System.Timers.Timer(500);
+        _debounceTimer.AutoReset = false;
+        _debounceTimer.Elapsed += (sender, args) => InvokeAsync(TriggerSearch);
+    }
+
+    private void CloseOverlays()
+    {
+        showMobileMenu = false;
+        showMobileSearch = false;
+    }
+
+    private void ToggleMobileSearch()
+    {
+        showMobileSearch = !showMobileSearch;
+        if (showMobileSearch) showMobileMenu = false;
+    }
+
+    private void ClearAndCloseSearch()
+    {
+        searchTerm = "";
+        showMobileSearch = false;
+        NavigationManager.NavigateTo("/shop");
+    }
+
+    private void OnSearchInput(ChangeEventArgs e)
+    {
+        searchTerm = e.Value?.ToString() ?? "";
+        _debounceTimer?.Stop();
+        _debounceTimer?.Start();
+    }
+
+    private void TriggerSearch()
+    {
+        if (string.IsNullOrWhiteSpace(searchTerm))
+        {
+            NavigationManager.NavigateTo("/shop");
+        }
+        else
+        {
+            NavigationManager.NavigateTo($"/shop?Search={Uri.EscapeDataString(searchTerm)}");
+        }
+    }
+
+    private void ToggleMobileMenu()
+    {
+        showMobileMenu = !showMobileMenu;
+        if (showMobileMenu) showMobileSearch = false;
+    }
+
+    private void CloseMobileMenu()
+    {
+        showMobileMenu = false;
+    }
+
+    public void Dispose()
+    {
+        _debounceTimer?.Dispose();
+    }
+}

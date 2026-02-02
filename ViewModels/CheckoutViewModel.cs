@@ -25,7 +25,6 @@ namespace MaisonTelecom.ViewModels
         // Region is optional
         public string Region { get; set; } = string.Empty;
 
-        [Required(ErrorMessage = "Please select a payment method")]
-        public string PaymentMethod { get; set; } = string.Empty;
+        // (Removed PaymentMethod property)
     }
 }

@@ -1,0 +1,137 @@
+﻿@page "/payment-confirm"
+@using MaisonTelecom.Services
+@using MaisonTelecom.Data
+@using Microsoft.EntityFrameworkCore
+@inject MaisonTelecom.Services.CampayService PaymentService
+@inject ApplicationDbContext DbContext
+@inject NavigationManager Nav
+
+<div class="container text-center mt-5">
+    @if (isPending)
+    {
+        <div class="card p-4 shadow-sm mx-auto" style="max-width: 500px;">
+            <h3 class="text-primary">Payment Initiated!</h3>
+            <p class="lead">Please check your phone.</p>
+
+            @if (!string.IsNullOrEmpty(ussd))
+            {
+                <div class="alert alert-warning">
+                    <strong>Action Required:</strong><br />
+                    Dial <span class="h4">@ussd</span> to approve.
+                </div>
+            }
+
+            <div class="spinner-border text-primary my-3" role="status"></div>
+            <p>Waiting for confirmation...</p>
+
+            <button class="btn btn-success w-100 mt-3" @onclick="CheckStatus">
+                I have confirmed payment
+            </button>
+            <br />
+            <small class="text-muted mt-2 d-block">Click above after approving on your phone.</small>
+        </div>
+    }
+    else if (statusMessage.StartsWith("Error") || statusMessage.StartsWith("Payment Failed"))
+    {
+        <div class="alert alert-danger" style="max-width: 600px; margin: auto;">
+            <h4>⚠️ Verification Failed</h4>
+            <p>@statusMessage</p>
+            @if (!string.IsNullOrEmpty(debugError))
+            {
+                <hr />
+                <code class="d-block text-start bg-light p-2 border">@debugError</code>
+            }
+            <br />
+            <a href="/checkout-shipping" class="btn btn-primary mt-3">Try Again</a>
+        </div>
+    }
+    else if (statusMessage == "Verifying...")
+    {
+        <h3>Verifying Payment... <span class="spinner-border"></span></h3>
+    }
+    else
+    {
+        <h3>@statusMessage</h3>
+    }
+</div>
+
+@code {
+    [SupplyParameterFromQuery] public string reference { get; set; }
+    [SupplyParameterFromQuery] public string ussd { get; set; }
+
+    private string statusMessage = "Verifying...";
+    private string debugError = "";
+    private bool isPending = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Check immediately on load
+        await CheckStatus();
+    }
+
+    private async Task CheckStatus()
+    {
+        if (string.IsNullOrEmpty(reference))
+        {
+            statusMessage = "Error: No Payment Reference found.";
+            return;
+        }
+
+        try
+        {
+            statusMessage = "Verifying...";
+            StateHasChanged(); // Refresh UI to show loading spinner
+
+            // 1. Ask Campay for status
+            var result = await PaymentService.VerifyPayment(reference);
+
+            if (result.Status == "complete" || result.Status == "SUCCESSFUL")
+            {
+                // SUCCESS: Mark as paid
+                isPending = false;
+                await MarkOrderAsPaid(result.MyOrderReference);
+            }
+            else if (result.Status == "PENDING")
+            {
+                // PENDING: Show the "Waiting" UI
+                isPending = true;
+                statusMessage = "Pending";
+            }
+            else
+            {
+                // FAILED
+                isPending = false;
+                statusMessage = $"Payment Failed (Status: {result.Status})";
+                debugError = "Transaction was declined or failed.";
+            }
+        }
+        catch (Exception ex)
+        {
+            statusMessage = "Error verifying payment.";
+            debugError = ex.Message;
+            isPending = false;
+        }
+    }
+
+    private async Task MarkOrderAsPaid(string orderRef)
+    {
+        if (string.IsNullOrEmpty(orderRef)) return;
+
+        var parts = orderRef.Split('_');
+        var orderIdStr = parts[0];
+
+        if (int.TryParse(orderIdStr, out int orderId))
+        {
+            var order = await DbContext.Orders.FindAsync(orderId);
+            if (order != null)
+            {
+                order.Status = "Paid";
+                order.PaymentMethod += " (Campay Verified)";
+                DbContext.Orders.Update(order);
+                await DbContext.SaveChangesAsync();
+
+                Nav.NavigateTo("/order-confirmation");
+            }
+        }
+    }
+}

@@ -1,0 +1,313 @@
+﻿@page "/shop"
+@rendermode InteractiveServer
+@using MaisonTelecom.Components.Shared
+@using MaisonTelecom.Data
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext dbContext
+@inject NavigationManager NavigationManager
+
+<div class="shop-page">
+    <div class="sub-header">
+        <div class="filter-bar">
+            <a href="/"><i class="fas fa-home"></i></a>
+
+            <button class="filter-btn" @onclick="ToggleFilter">
+                @(showFilter ? "Hide Filter" : "Show Filter")
+            </button>
+
+            <div class="sort-container">
+                <button class="filter-btn" @onclick="ToggleSortMenu">
+                    @GetSortLabel(currentSortOption) <i class="fas fa-chevron-down" style="font-size: 0.8em; margin-left: 5px;"></i>
+                </button>
+
+                @if (showSortMenu)
+                {
+                    <div class="sort-dropdown-menu">
+                        <div class="sort-option" @onclick='() => ApplySort("latest")'>Latest</div>
+                        <div class="sort-option" @onclick='() => ApplySort("price_asc")'>Price: Low to High</div>
+                        <div class="sort-option" @onclick='() => ApplySort("price_desc")'>Price: High to Low</div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <h1>@(string.IsNullOrEmpty(Search) ? (string.IsNullOrEmpty(selectedBrandFilter) ? "All Products" : $"{selectedBrandFilter} Products") : $"Results for '{Search}'")</h1>
+
+        <div class="category-filters">
+            <button class="@(selectedCategory == "Phones" ? "active" : "")" @onclick='() => FilterByCategory("Phones")'>Phones</button>
+            <button class="@(selectedCategory == "Laptops" ? "active" : "")" @onclick='() => FilterByCategory("Laptops")'>Laptops</button>
+            <button class="@(selectedCategory == "Accessories" ? "active" : "")" @onclick='() => FilterByCategory("Accessories")'>Accessories</button>
+        </div>
+    </div>
+
+    @if (showFilter)
+    {
+        <div class="filter-options">
+            <h3>Filter by Brand</h3>
+            <div class="brand-grid">
+                <button class="btn btn-sm @(string.IsNullOrEmpty(selectedBrandFilter) ? "btn-dark" : "btn-outline-dark")"
+                        @onclick="ClearBrandFilter">
+                    All Brands
+                </button>
+
+                @foreach (var brand in BrandOptions)
+                {
+                    <button class="btn btn-sm @(selectedBrandFilter == brand ? "btn-primary" : "btn-outline-secondary")"
+                            @onclick="() => FilterByBrand(brand)">
+                        @brand
+                    </button>
+                }
+            </div>
+        </div>
+    }
+
+    <div class="product-grid">
+        @if (PagedProducts != null)
+        {
+            @if (PagedProducts.Count > 0)
+            {
+                @foreach (var product in PagedProducts)
+                {
+                    <ProductCard Product="product" />
+                }
+            }
+            else
+            {
+                <p style="padding: 20px; width: 100%; text-align: center;">No products found.</p>
+            }
+        }
+        else
+        {
+            <p>Loading products...</p>
+        }
+    </div>
+
+    <div class="pagination">
+        <button disabled="@(CurrentPage == 1)" @onclick="() => NavigateToPage(CurrentPage - 1)">&lt;</button>
+        @for (int i = 1; i <= TotalPages; i++)
+        {
+            var pageNumber = i;
+            <button class="@(CurrentPage == pageNumber ? "active" : "")" @onclick="() => NavigateToPage(pageNumber)">@pageNumber</button>
+        }
+        <button disabled="@(CurrentPage == TotalPages)" @onclick="() => NavigateToPage(CurrentPage + 1)">&gt;</button>
+    </div>
+
+    <div class="recently-viewed">
+        <h2>Recently Viewed</h2>
+        <div class="product-grid">
+            @if (RecentlyViewedProducts != null)
+            {
+                @foreach (var product in RecentlyViewedProducts)
+                {
+                    <ProductCard Product="product" />
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .sort-container {
+        position: relative;
+        display: inline-block;
+        margin-left: 10px;
+    }
+
+    .sort-dropdown-menu {
+        position: absolute;
+        top: 110%;
+        left: 0;
+        background-color: white;
+        min-width: 160px;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        border-radius: 6px;
+        border: 1px solid #eee;
+        z-index: 1000;
+        overflow: hidden;
+    }
+
+    .sort-option {
+        padding: 10px 15px;
+        cursor: pointer;
+        font-size: 0.95em;
+        color: #333;
+        transition: background-color 0.2s;
+    }
+
+        .sort-option:hover {
+            background-color: #f0f0f0;
+            color: #000;
+        }
+
+    .filter-options {
+        background-color: #f9f9f9;
+        padding: 20px;
+        margin-bottom: 20px;
+        border: 1px solid #eee;
+        border-radius: 8px;
+    }
+
+    .brand-grid {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 10px;
+    }
+</style>
+
+@code {
+    // FIX: Fully qualified name to distinguish from 'Product.razor'
+    private List<MaisonTelecom.Models.Product> PagedProducts;
+    private List<MaisonTelecom.Models.Product> RecentlyViewedProducts;
+
+    public List<string> BrandOptions { get; set; } = new List<string> { "Apple", "Samsung", "Google", "OnePlus" };
+
+    private int CurrentPage = 1;
+    private int PageSize = 18;
+    private int TotalPages;
+    private bool showFilter = false;
+
+    private bool showSortMenu = false;
+    private string selectedCategory = "Phones";
+    private string selectedBrandFilter = null;
+    private string currentSortOption = "latest";
+
+    [SupplyParameterFromQuery]
+    public string? Search { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // FIX: Ensure recently viewed also only shows Physical products
+        RecentlyViewedProducts = await dbContext.Products
+            .Where(p => p.Type == MaisonTelecom.Models.ProductType.Physical)
+            .OrderByDescending(p => p.Id)
+            .Take(3)
+            .ToListAsync();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (!string.IsNullOrEmpty(Search))
+        {
+            selectedCategory = null;
+            selectedBrandFilter = null;
+        }
+        else if (string.IsNullOrEmpty(selectedCategory) && string.IsNullOrEmpty(selectedBrandFilter))
+        {
+            selectedCategory = "Phones";
+        }
+
+        await UpdateProductList();
+    }
+
+    private async Task UpdateProductList()
+    {
+        // FIX: Start by filtering for ONLY Physical items
+        var query = dbContext.Products
+            .Where(p => p.Type == MaisonTelecom.Models.ProductType.Physical)
+            .AsQueryable();
+
+        // 1. Search
+        if (!string.IsNullOrEmpty(Search))
+        {
+            query = query.Where(p =>
+                p.Name.Contains(Search) ||
+                p.Brand.Contains(Search) ||
+                p.ProductCategory.Contains(Search));
+        }
+        // 2. Brand Filter
+        else if (!string.IsNullOrEmpty(selectedBrandFilter))
+        {
+            query = query.Where(p => p.Brand == selectedBrandFilter);
+        }
+        // 3. Category Filter
+        else if (!string.IsNullOrEmpty(selectedCategory))
+        {
+            query = query.Where(p => p.ProductCategory == selectedCategory);
+        }
+
+        // 4. Sorting Logic
+        switch (currentSortOption)
+        {
+            case "price_asc":
+                query = query.OrderBy(p => p.Price);
+                break;
+            case "price_desc":
+                query = query.OrderByDescending(p => p.Price);
+                break;
+            case "latest":
+            default:
+                query = query.OrderByDescending(p => p.Id);
+                break;
+        }
+
+        var totalProductCount = await query.CountAsync();
+        TotalPages = totalProductCount > 0 ? (int)Math.Ceiling(totalProductCount / (double)PageSize) : 1;
+
+        PagedProducts = await query
+            .Skip((CurrentPage - 1) * PageSize)
+            .Take(PageSize)
+            .ToListAsync();
+    }
+
+    private void ToggleSortMenu()
+    {
+        showSortMenu = !showSortMenu;
+    }
+
+    private async Task ApplySort(string sortOption)
+    {
+        currentSortOption = sortOption;
+        showSortMenu = false;
+        CurrentPage = 1;
+        await UpdateProductList();
+    }
+
+    private string GetSortLabel(string option)
+    {
+        return option switch
+        {
+            "price_asc" => "Price: Low to High",
+            "price_desc" => "Price: High to Low",
+            _ => "Latest"
+        };
+    }
+
+    private async Task NavigateToPage(int pageNumber)
+    {
+        CurrentPage = pageNumber;
+        await UpdateProductList();
+    }
+
+    private async Task FilterByCategory(string category)
+    {
+        selectedCategory = category;
+        selectedBrandFilter = null;
+        Search = null;
+        CurrentPage = 1;
+        NavigationManager.NavigateTo("/shop");
+        await UpdateProductList();
+    }
+
+    private async Task FilterByBrand(string brand)
+    {
+        selectedBrandFilter = brand;
+        selectedCategory = null;
+        Search = null;
+        CurrentPage = 1;
+        NavigationManager.NavigateTo("/shop");
+        await UpdateProductList();
+    }
+
+    private async Task ClearBrandFilter()
+    {
+        selectedBrandFilter = null;
+        selectedCategory = "Phones";
+        await UpdateProductList();
+    }
+
+    private void ToggleFilter()
+    {
+        showFilter = !showFilter;
+    }
+}

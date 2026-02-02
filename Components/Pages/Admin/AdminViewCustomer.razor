@@ -1,0 +1,130 @@
+﻿@page "/admin/customer/{Id:int}"
+@rendermode InteractiveServer
+@layout MaisonTelecom.Components.Layout.AdminLayout
+
+@using MaisonTelecom.Data
+@using MaisonTelecom.Models
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavigationManager
+
+<div class="admin-page-container">
+    <h1 class="admin-page-title">Customer Details</h1>
+
+    @if (customer == null)
+    {
+        <p>Loading customer details...</p>
+    }
+    else
+    {
+        <div class="admin-content-box">
+            <div class="admin-content-header">
+                <h2>Personal Info: @customer.FirstName @customer.LastName</h2>
+                <button class="back-btn" @onclick="GoBack">Back</button>
+            </div>
+
+            <p><strong>Phone:</strong> @customer.PhoneNumber</p>
+            @if (customer.Orders.Any())
+            {
+                <p><strong>Joined:</strong> @customer.Orders.Min(o => o.OrderDate).ToString("dd/MM/yyyy")</p>
+            }
+            @if (!string.IsNullOrWhiteSpace(customer.TownCity))
+            {
+                <p>
+                    <strong>Default Location:</strong> @customer.TownCity
+                    @if (!string.IsNullOrWhiteSpace(customer.Region))
+                    {
+                        <span> (@customer.Region)</span>
+                    }
+                </p>
+            }
+
+            <div class="admin-content-header">
+                <h2>Purchases Made (@totalItemsPurchased items)</h2>
+            </div>
+            <div class="admin-table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>S/N</th>
+                            <th>Date and Time</th>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (purchaseItems.Any())
+                        {
+                            @foreach (var (item, index) in purchaseItems.Select((value, i) => (value, i)))
+                            {
+                                <tr>
+                                    <td>@(index + 1)</td>
+                                    <td>@item.OrderDate.ToString("dd/MM/yy HH:mm")</td>
+                                    <td>@item.ProductName</td>
+                                    <td>@item.Quantity</td>
+                                    <td>@item.Subtotal.ToString("N0") FCFA</td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="5">No purchases made yet.</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Customer customer;
+    private List<PurchaseItemViewModel> purchaseItems = new();
+    private int totalItemsPurchased = 0;
+
+    // A small view model to flatten the data for the table
+    private class PurchaseItemViewModel
+    {
+        public DateTime OrderDate { get; set; }
+        public string ProductName { get; set; }
+        public int Quantity { get; set; }
+        public decimal Subtotal { get; set; }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        customer = await DbContext.Customers
+            .Include(c => c.Orders)
+                .ThenInclude(o => o.OrderItems)
+            .FirstOrDefaultAsync(c => c.Id == Id);
+
+        if (customer != null)
+        {
+            // Flatten the order items for easier display
+            // Updated to use the new "Price" and "ProductName" fields
+            purchaseItems = customer.Orders
+                .SelectMany(order => order.OrderItems.Select(item => new PurchaseItemViewModel
+                {
+                    OrderDate = order.OrderDate,
+                    ProductName = item.ProductName, // Uses the stored snapshot name
+                    Quantity = item.Quantity,
+                    Subtotal = item.Quantity * item.Price // Uses the stored snapshot price
+                }))
+                .OrderByDescending(item => item.OrderDate)
+                .ToList();
+
+            totalItemsPurchased = purchaseItems.Sum(item => item.Quantity);
+        }
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/admin/customers");
+    }
+}

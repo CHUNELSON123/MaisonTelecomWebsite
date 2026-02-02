@@ -1,0 +1,65 @@
+﻿@page "/admin/dashboard"
+@layout MaisonTelecom.Components.Layout.AdminLayout
+@rendermode InteractiveServer
+@using MaisonTelecom.Data
+@using Microsoft.EntityFrameworkCore
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IDbContextFactory<ApplicationDbContext> DbFactory
+@inject AuthenticationStateProvider AuthStateProvider
+
+<div class="dashboard-content">
+    <h1 class="welcome-heading">Welcome, @UserName</h1>
+
+    <div class="stats-section">
+        <h2 class="quick-stats-heading">Quick Stats</h2>
+        <div class="quick-stats-container">
+            <div class="stat-card">
+                <div class="stat-title">Total Products</div>
+                <div class="stat-value">
+                    @(isLoading ? "..." : totalProducts)
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Total Orders</div>
+                <div class="stat-value">
+                    @(isLoading ? "..." : totalOrders)
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">Active Customers</div>
+                <div class="stat-value">
+                    @(isLoading ? "..." : totalCustomers)
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private int totalProducts;
+    private int totalOrders;
+    private int totalCustomers;
+    private bool isLoading = true;
+    private string UserName = "Admin";
+
+    protected override async Task OnInitializedAsync()
+    {
+        // 1. Get User Name
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        if (user.Identity != null && user.Identity.IsAuthenticated)
+        {
+            UserName = user.Identity.Name ?? "Admin";
+        }
+
+        // 2. Load Stats using the Factory (Fixes the NullReference Exception)
+        using var context = await DbFactory.CreateDbContextAsync();
+
+        totalProducts = await context.Products.CountAsync();
+        totalOrders = await context.Orders.CountAsync();
+        totalCustomers = await context.Customers.CountAsync();
+
+        isLoading = false;
+    }
+}

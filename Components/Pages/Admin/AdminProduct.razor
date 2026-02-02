@@ -1,0 +1,163 @@
+﻿@page "/admin/products"
+@rendermode InteractiveServer
+@layout MaisonTelecom.Components.Layout.AdminLayout
+@using Microsoft.EntityFrameworkCore
+@using MaisonTelecom.Data
+@* Remove "using MaisonTelecom.Models" to avoid confusion, we will use full names *@
+@inject ApplicationDbContext dbContext
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+
+<div class="admin-page-container">
+    <h1 class="admin-page-title">Product</h1>
+    <div class="admin-content-box">
+        <div class="admin-content-header">
+            <h2>Product List</h2>
+            <a href="/admin/products/add" class="add-new-button">+</a>
+        </div>
+        <div class="admin-table-container">
+            <table class="admin-table">
+                <thead>
+                    <tr>
+                        <th>S/N</th>
+                        <th>Product Name</th>
+                        <th>Product Brand</th>
+                        <th>Product Category</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (pagedProducts == null)
+                    {
+                        <tr><td colspan="7">Loading...</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var (product, index) in pagedProducts.Select((p, i) => (p, i)))
+                        {
+                            <tr>
+                                <td>@((index + 1) + (currentPage - 1) * pageSize)</td>
+                                <td>@product.Name</td>
+                                <td>@product.Brand</td>
+                                <td>@product.ProductCategory</td>
+                                <td>@product.Price.ToString("N0") FCFA</td>
+                                <td>@product.StockQuantity</td>
+                                <td>
+                                    <button class="btn btn-sm btn-primary" @onclick="() => EditProduct(product.Id)">Edit</button>
+                                    <button class="btn btn-sm btn-danger" @onclick="() => DeleteProduct(product.Id)">Delete</button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div class="admin-pagination">
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                int pageNum = i;
+                <span class="@(currentPage == pageNum ? "active" : "")" @onclick="() => GoToPage(pageNum)">
+                    @GetCircledNumber(pageNum)
+                </span>
+            }
+
+            @if (currentPage < totalPages)
+            {
+                <span @onclick="() => GoToPage(currentPage + 1)">Next →</span>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+    // FIX: Fully qualified name to avoid conflict with the Page class 'Product'
+    private List<MaisonTelecom.Models.Product>? pagedProducts;
+
+    private int currentPage = 1;
+    private int pageSize = 20;
+    private int totalProducts;
+    private int totalPages;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // FIX: Count ONLY Physical products
+        totalProducts = await dbContext.Products
+            .Where(p => p.Type == MaisonTelecom.Models.ProductType.Physical)
+            .CountAsync();
+
+        totalPages = totalProducts > 0 ? (int)Math.Ceiling(totalProducts / (double)pageSize) : 1;
+        await LoadPageData();
+    }
+
+    private async Task LoadPageData()
+    {
+        // FIX: Fetch ONLY Physical products
+        pagedProducts = await dbContext.Products
+                                .Where(p => p.Type == MaisonTelecom.Models.ProductType.Physical)
+                                .OrderBy(p => p.Name)
+                                .Skip((currentPage - 1) * pageSize)
+                                .Take(pageSize)
+                                .ToListAsync();
+    }
+
+    private async Task GoToPage(int page)
+    {
+        if (page < 1 || page > totalPages || page == currentPage) return;
+        currentPage = page;
+        await LoadPageData();
+    }
+
+    private string GetCircledNumber(int num)
+    {
+        return num switch
+        {
+            1 => "①",
+            2 => "②",
+            3 => "③",
+            4 => "④",
+            5 => "⑤",
+            6 => "⑥",
+            7 => "⑦",
+            8 => "⑧",
+            9 => "⑨",
+            10 => "⑩",
+            _ => num.ToString()
+        };
+    }
+
+    private void EditProduct(int productId)
+    {
+        NavigationManager.NavigateTo($"/admin/products/edit/{productId}");
+    }
+
+    private async Task DeleteProduct(int productId)
+    {
+        // FIX: Use full model name
+        var product = await dbContext.Products.FindAsync(productId);
+        if (product != null)
+        {
+            var confirmed = await JSRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete {product.Name}?");
+            if (confirmed)
+            {
+                dbContext.Products.Remove(product);
+                await dbContext.SaveChangesAsync();
+
+                // FIX: Recount ONLY Physical products after delete
+                totalProducts = await dbContext.Products
+                    .Where(p => p.Type == MaisonTelecom.Models.ProductType.Physical)
+                    .CountAsync();
+
+                totalPages = totalProducts > 0 ? (int)Math.Ceiling(totalProducts / (double)pageSize) : 1;
+
+                if (currentPage > totalPages) currentPage = totalPages;
+                if (currentPage < 1) currentPage = 1;
+
+                await LoadPageData();
+                StateHasChanged();
+            }
+        }
+    }
+}

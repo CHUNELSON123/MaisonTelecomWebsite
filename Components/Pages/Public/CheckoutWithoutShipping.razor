@@ -1,0 +1,150 @@
+﻿@page "/checkout-pickup"
+@rendermode InteractiveServer
+@using MaisonTelecom.Services
+@using MaisonTelecom.Models
+@using MaisonTelecom.ViewModels
+@inject StateContainer State
+@inject NavigationManager NavigationManager
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+<div class="checkout-page">
+    <div class="checkout-form">
+        @* CHANGED: OnValidSubmit -> OnSubmit (Ignores validation) *@
+        <EditForm Model="@checkoutModel" OnSubmit="OrderViaWhatsApp">
+            @* REMOVED: <DataAnnotationsValidator /> *@
+
+            <div class="delivery-section">
+                <h2>Delivery</h2>
+                <div class="delivery-options">
+                    <label class="radio-option active">
+                        <div>
+                            <input type="radio" name="delivery" value="pickup" checked />
+                            <span>Pickup in store</span>
+                        </div>
+                        <i class="fas fa-store"></i>
+                    </label>
+                    <label class="radio-option" @onclick='() => NavigationManager.NavigateTo("/checkout-shipping")'>
+                        <div>
+                            <input type="radio" name="delivery" value="ship" />
+                            <span>Ship</span>
+                        </div>
+                        <i class="fas fa-truck"></i>
+                    </label>
+                </div>
+            </div>
+
+            <div class="location-section">
+                <h2>Shop Location</h2>
+                <input type="text" value="Douala, Cameroon" readonly />
+            </div>
+
+            <div class="payment-section">
+                <h2>Complete Order</h2>
+                <p>Click below to send your order details directly to us on WhatsApp.</p>
+            </div>
+
+            <button type="submit" class="pay-now-button action-button whatsapp-order-button">
+                Order via WhatsApp
+            </button>
+        </EditForm>
+    </div>
+
+    <div class="order-summary">
+        <h2>Order Summary</h2>
+        @if (State.Cart.Any())
+        {
+            @foreach (var item in State.Cart)
+            {
+                <div class="summary-item">
+                    <img src="@(string.IsNullOrEmpty(item.Product.ImageURL1) ? "/Image/iphone_thumb.jpg" : item.Product.ImageURL1)" alt="@item.Product.Name" />
+                    <div>
+                        <p>@item.Product.Name</p>
+                        <p>FCFA @item.Product.Price.ToString("N0")</p>
+                        <div class="quantity-controls">
+                            <button type="button" @onclick="() => DecrementQuantity(item)">-</button>
+                            <span>@item.Quantity</span>
+                            <button type="button" @onclick="() => IncrementQuantity(item)">+</button>
+                            <button type="button" class="remove-button" @onclick="() => RemoveItem(item)">Remove</button>
+                        </div>
+                    </div>
+                </div>
+            }
+            <hr />
+            <div class="summary-total">
+                <p>Subtotal: @State.Cart.Sum(i => i.Quantity) items <span>FCFA @Subtotal.ToString("N0")</span></p>
+            </div>
+            <hr />
+            <div class="summary-grand-total">
+                <p>Total <span>FCFA @(Subtotal.ToString("N0"))</span></p>
+            </div>
+        }
+        else
+        {
+            <p>Your cart is empty.</p>
+        }
+    </div>
+</div>
+
+@code {
+    private CheckoutViewModel checkoutModel = new();
+    private decimal Subtotal => State.Cart.Any() ? State.Cart.Sum(item => item.Product.Price * item.Quantity) : 0;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await State.InitializeAsync();
+            StateHasChanged();
+        }
+    }
+
+    protected override void OnInitialized()
+    {
+        State.OnStateChange += StateHasChanged;
+    }
+
+    private void OrderViaWhatsApp()
+    {
+        var orderSummary = "";
+        var itemNumber = 1;
+        foreach (var item in State.Cart)
+        {
+            orderSummary += $"{itemNumber}. {item.Product.Name} (Quantity: {item.Quantity}) - FCFA {item.Product.Price:N0}\n";
+            itemNumber++;
+        }
+
+        var total = Subtotal;
+        orderSummary += $"Total: FCFA {total:N0}";
+
+        var phoneNumber = "237671007313";
+        var message = $"Hello Maison Telecom, I would like to place the following order for pickup:\n\n{orderSummary}";
+        var encodedMessage = Uri.EscapeDataString(message);
+        var whatsappUrl = $"https://wa.me/{phoneNumber}?text={encodedMessage}";
+
+        NavigationManager.NavigateTo(whatsappUrl, forceLoad: true);
+    }
+
+    private async Task IncrementQuantity(CartItem item)
+    {
+        await State.UpdateCartItemQuantity(item, item.Quantity + 1);
+    }
+
+    private async Task DecrementQuantity(CartItem item)
+    {
+        if (item.Quantity > 1)
+        {
+            await State.UpdateCartItemQuantity(item, item.Quantity - 1);
+        }
+    }
+
+    private async Task RemoveItem(CartItem item)
+    {
+        await State.RemoveFromCart(item);
+    }
+
+    public void Dispose()
+    {
+        State.OnStateChange -= StateHasChanged;
+    }
+}

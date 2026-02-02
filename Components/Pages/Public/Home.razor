@@ -1,0 +1,438 @@
+﻿@page "/"
+@rendermode InteractiveServer
+@using MaisonTelecom.Components.Shared
+@using MaisonTelecom.Models
+@using MaisonTelecom.Services
+@inject ProductService ProductService
+@inject IJSRuntime JSRuntime
+@implements IDisposable
+
+<PageTitle>Home</PageTitle>
+
+@* --- HERO SECTION --- *@
+<div class="hero-section">
+    @for (int i = 0; i < HeroImages.Count; i++)
+    {
+        <div class="hero-slide @(currentHeroIndex == i ? "active" : "")">
+            <img src="@HeroImages[i]" alt="Hero Image @i" />
+        </div>
+    }
+    <div class="hero-content">
+        <h1 class="hero-title">Upgrade Your Digital Life</h1>
+        <p class="hero-subtitle">Authentic Phones, Laptops & Professional Repairs in Cameroon.</p>
+        <a href="/shop" class="btn btn-primary btn-lg" style="border-radius: 30px; padding: 12px 40px; font-weight:bold; color: white; text-decoration: none;">Shop Now</a>
+    </div>
+</div>
+
+<div class="container mt-5">
+
+    @* --- Trending Products --- *@
+    <section class="product-section">
+        <h2>Trending Products</h2>
+        <div class="product-carousel">
+            @if (TrendingProducts.Any())
+            {
+                @foreach (MaisonTelecom.Models.Product product in TrendingProducts)
+                {
+                    <ProductCard Product="product" />
+                }
+            }
+        </div>
+    </section>
+
+    @* --- Latest Products --- *@
+    <section class="product-section">
+        <h2>Latest Products</h2>
+        <div class="category-filters mb-3">
+            <button class="btn @(selectedCategory == "Phones" ? "active" : "")" @onclick='() => LoadLatestProducts("Phones")'>Phones</button>
+            <button class="btn @(selectedCategory == "Laptops" ? "active" : "")" @onclick='() => LoadLatestProducts("Laptops")'>Laptops</button>
+            <button class="btn @(selectedCategory == "Accessories" ? "active" : "")" @onclick='() => LoadLatestProducts("Accessories")'>Accessories</button>
+        </div>
+        <div class="product-carousel">
+            @if (LatestProducts.Any())
+            {
+                @foreach (MaisonTelecom.Models.Product product in LatestProducts)
+                {
+                    <ProductCard Product="product" />
+                }
+            }
+        </div>
+    </section>
+
+    @* --- Shop by Brand --- *@
+    <section class="product-section">
+        <h2>Shop by Brand</h2>
+        <div class="category-filters mb-3" style="display:flex; flex-wrap:wrap;">
+            @if (AvailableBrands.Any())
+            {
+                @foreach (var brand in AvailableBrands)
+                {
+                    <button class="btn @(selectedBrand == brand ? "active" : "")"
+                            @onclick='() => LoadBrandProducts(brand)'>
+                        @brand
+                    </button>
+                }
+            }
+            else
+            {
+                <p class="text-muted">Loading brands...</p>
+            }
+        </div>
+        <div class="product-carousel">
+            @if (BrandProducts.Any())
+            {
+                @foreach (MaisonTelecom.Models.Product product in BrandProducts)
+                {
+                    <ProductCard Product="product" />
+                }
+            }
+            else
+            {
+                <p class="text-muted p-3">No products found for @selectedBrand.</p>
+            }
+        </div>
+    </section>
+
+    @* --- REVIEWS SECTION --- *@
+    <section class="reviews-section">
+        <div class="reviews-header">
+            <h2>What Our Customers Say</h2>
+            <button class="btn btn-outline-primary" @onclick="OpenReviewModal">
+                <i class="fas fa-pen"></i> Write a Review
+            </button>
+        </div>
+        <div class="reviews-carousel">
+            @if (CustomerReviews.Any())
+            {
+                @foreach (var review in CustomerReviews)
+                {
+                    <div class="review-card">
+                        <p>"@review.Content"</p>
+                        <div class="reviewer">
+                            <span>
+                                @for (int i = 0; i < review.Rating; i++)
+                                {
+                                    <span style="color:#f1c40f; display:inline;">★</span>
+                                }
+                                - @review.ReviewerName
+                            </span>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted">No reviews yet. Be the first to share your experience!</p>
+                </div>
+            }
+        </div>
+    </section>
+</div>
+
+@* ... Modal ... *@
+@if (isReviewModalOpen)
+{
+    <div class="review-modal-backdrop" @onclick="CloseReviewModal">
+        <div class="review-modal" @onclick:stopPropagation="true">
+            <h3 style="margin-bottom:20px;">Rate Your Experience</h3>
+            <div class="form-group mb-3">
+                <label>Your Name</label>
+                <input type="text" class="form-control" @bind="newReviewerName" />
+            </div>
+            <div class="form-group mb-3">
+                <label>Rating</label>
+                <div class="star-rating">
+                    @for (int i = 1; i <= 5; i++)
+                    {
+                        int star = i;
+                        <span class="@(star <= newReviewRating ? "filled" : "")" @onclick="() => SetRating(star)">★</span>
+                    }
+                </div>
+            </div>
+            <div class="form-group mb-3">
+                <label>Your Review</label>
+                <textarea class="form-control" rows="3" @bind="newReviewText"></textarea>
+            </div>
+            <div style="display:flex; justify-content:flex-end; gap:10px;">
+                <button class="btn btn-secondary" @onclick="CloseReviewModal">Cancel</button>
+                <button class="btn btn-primary" @onclick="SubmitReview">Post</button>
+            </div>
+        </div>
+    </div>
+}
+
+<style>
+    /* UPDATED: Height set to 800px */
+    .hero-section {
+        position: relative;
+        height: 500px;
+        overflow: hidden;
+        background-color: #000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        border-radius: 20px;
+        margin-bottom: 40px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    }
+
+    .hero-slide {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        transition: opacity 1.5s ease-in-out;
+        z-index: 1;
+    }
+
+        .hero-slide.active {
+            opacity: 0.5;
+        }
+
+        .hero-slide img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 800px;
+        padding: 20px;
+        animation: fadeInUp 1s ease-out;
+    }
+
+    .hero-title {
+        color: white;
+        font-weight: 800;
+        font-size: 3rem;
+        text-shadow: 2px 2px 10px rgba(0,0,0,0.7);
+        margin-bottom: 15px;
+    }
+
+    .hero-subtitle {
+        color: #f8f9fa;
+        font-size: 1.3rem;
+        margin-bottom: 25px;
+        text-shadow: 1px 1px 5px rgba(0,0,0,0.7);
+    }
+
+    @@keyframes fadeInUp {
+        from {
+            opacity: 0;
+            transform: translateY(30px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .review-modal-backdrop {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        z-index: 2000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .review-modal {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        width: 100%;
+        max-width: 500px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        animation: slideDown 0.3s ease-out;
+    }
+
+    @@keyframes slideDown {
+        from {
+            transform: translateY(-20px);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+
+    .star-rating {
+        font-size: 1.5rem;
+        color: #ddd;
+        cursor: pointer;
+    }
+
+        .star-rating .filled {
+            color: #f1c40f;
+        }
+
+    .reviews-section {
+        padding: 40px 0;
+        background-color: white;
+    }
+
+    .reviews-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .reviews-carousel {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 20px;
+    }
+
+    .review-card {
+        border: 1px solid #f0f0f0;
+        border-radius: 12px;
+        padding: 25px;
+        background-color: #fcfcfc;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+    }
+
+    .reviewer span {
+        font-weight: bold;
+        color: #333;
+        display: block;
+        margin-top: 10px;
+    }
+
+    .category-filters .btn {
+        margin-right: 10px;
+        margin-bottom: 10px;
+        border-radius: 20px;
+        padding: 8px 20px;
+        border: 1px solid #ddd;
+        background: white;
+        transition: all 0.3s;
+    }
+
+        .category-filters .btn:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+        }
+
+        .category-filters .btn.active {
+            background: #007bff;
+            color: white;
+            border-color: #007bff;
+            box-shadow: 0 4px 10px rgba(0,123,255,0.3);
+        }
+</style>
+
+@code {
+    private List<string> HeroImages = new() { "/Image/masonhero.png" };
+    private int currentHeroIndex = 0;
+    private System.Timers.Timer? _timer;
+
+    private List<MaisonTelecom.Models.Product> TrendingProducts = new();
+    private List<MaisonTelecom.Models.Product> LatestProducts = new();
+    private List<MaisonTelecom.Models.Product> BrandProducts = new();
+    private List<Review> CustomerReviews = new();
+    private List<string> AvailableBrands = new();
+
+    private string selectedBrand = "";
+    private string selectedCategory = "Phones";
+
+    private bool isReviewModalOpen = false;
+    private string newReviewerName = "";
+    private string newReviewText = "";
+    private int newReviewRating = 5;
+
+    protected override async Task OnInitializedAsync()
+    {
+        AvailableBrands = await ProductService.GetAttributeValuesAsync("Brand");
+        if (AvailableBrands.Any())
+            selectedBrand = AvailableBrands.First();
+        else
+            selectedBrand = "Apple";
+
+        TrendingProducts = await ProductService.GetTrendingProductsAsync();
+        await LoadLatestProducts(selectedCategory);
+
+        if (!string.IsNullOrEmpty(selectedBrand))
+            await LoadBrandProducts(selectedBrand);
+
+        await LoadReviews();
+
+        _timer = new System.Timers.Timer(5000);
+        _timer.Elapsed += (s, e) => InvokeAsync(NextSlide);
+        _timer.AutoReset = true;
+        _timer.Start();
+    }
+
+    private async Task LoadReviews()
+    {
+        CustomerReviews = await ProductService.GetRecentReviewsAsync();
+    }
+
+    private void NextSlide()
+    {
+        currentHeroIndex = (currentHeroIndex + 1) % HeroImages.Count;
+        StateHasChanged();
+    }
+
+    private async Task LoadLatestProducts(string category)
+    {
+        selectedCategory = category;
+        LatestProducts = await ProductService.GetLatestProductsAsync(category);
+    }
+
+    private async Task LoadBrandProducts(string brandName)
+    {
+        selectedBrand = brandName;
+        BrandProducts = await ProductService.GetBrandProductsAsync(brandName);
+    }
+
+    private void OpenReviewModal() => isReviewModalOpen = true;
+    private void CloseReviewModal() => isReviewModalOpen = false;
+    private void SetRating(int rating) => newReviewRating = rating;
+
+    private async Task SubmitReview()
+    {
+        if (string.IsNullOrWhiteSpace(newReviewerName) || string.IsNullOrWhiteSpace(newReviewText))
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "Please enter your name and review text.");
+            return;
+        }
+
+        var newReview = new Review
+        {
+            ReviewerName = newReviewerName,
+            Content = newReviewText,
+            Rating = newReviewRating,
+            DatePosted = DateTime.Now
+        };
+
+        await ProductService.AddReviewAsync(newReview);
+        isReviewModalOpen = false;
+        await JSRuntime.InvokeVoidAsync("alert", "Thank you! Your review has been posted.");
+        newReviewerName = "";
+        newReviewText = "";
+        newReviewRating = 5;
+        await LoadReviews();
+    }
+
+    public void Dispose()
+    {
+        _timer?.Dispose();
+    }
+}

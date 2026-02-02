@@ -9,13 +9,15 @@
 
         <div class="card-actions">
             <div class="icon-container wishlist-icon">
-                <a @onclick="() => AddToWishlist()" @onclick:preventDefault title="Add to Wishlist">
+                @* Removed 'title' attribute to prevent double tooltip *@
+                <a @onclick="() => AddToWishlist()" @onclick:preventDefault>
                     <i class="far fa-heart"></i>
                 </a>
                 <span class="tooltip-text">Add to Wishlist</span>
             </div>
             <div class="icon-container cart-icon">
-                <a @onclick="() => AddToCart()" @onclick:preventDefault title="Add to Cart">
+                @* Removed 'title' attribute to prevent double tooltip *@
+                <a @onclick="() => AddToCart()" @onclick:preventDefault>
                     <i class="fas fa-shopping-cart"></i>
                 </a>
                 <span class="tooltip-text">Add to Cart</span>
@@ -29,7 +31,26 @@
             <span class="title">@Product.Name</span>
             <span class="specs">@Product.RAM RAM, @Product.ROM ROM</span>
             <span class="condition">State: New</span>
-            <span class="price">FCFA @Product.Price.ToString("N0")</span>
+
+            <div class="price-container">
+                @if (Product.PromoPrice.HasValue && Product.PromoPrice.Value < Product.Price && Product.PromoPrice.Value > 0)
+                {
+                    @* Show Discount Look *@
+                    <span class="original-price" style="text-decoration: line-through; color: #888; font-size: 0.9em; margin-right: 8px;">
+                        FCFA @Product.Price.ToString("N0")
+                    </span>
+                    <span class="promo-price" style="color: #d9534f; font-weight: bold; font-size: 1.1em;">
+                        FCFA @Product.PromoPrice.Value.ToString("N0")
+                    </span>
+                }
+                else
+                {
+                    @* Show Normal Look *@
+                    <span class="price" style="font-weight: bold;">
+                        FCFA @Product.Price.ToString("N0")
+                    </span>
+                }
+            </div>
         </div>
     </a>
 </div>

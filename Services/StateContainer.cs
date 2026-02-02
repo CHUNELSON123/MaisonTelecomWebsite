@@ -194,6 +194,27 @@ namespace MaisonTelecom.Services
             }
         }
 
+        // ---- THIS IS THE NEW METHOD YOU NEED ----
+        public async Task ClearCart()
+        {
+            if (!_isInitialized) await InitializeAsync();
+
+            using var context = await _dbContextFactory.CreateDbContextAsync();
+            var itemsToClear = await context.CartItems
+                .Where(ci => ci.SessionId == _sessionId)
+                .ToListAsync();
+
+            if (itemsToClear.Any())
+            {
+                context.CartItems.RemoveRange(itemsToClear);
+                await context.SaveChangesAsync();
+            }
+
+            Cart.Clear();
+            NotifyStateChanged();
+        }
+        // -------------------------------------------
+
         private void NotifyStateChanged() => OnStateChange?.Invoke();
     }
 }

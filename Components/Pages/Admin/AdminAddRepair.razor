@@ -1,0 +1,114 @@
+﻿@page "/admin/repairs/add"
+@using MaisonTelecom.Models
+@using MaisonTelecom.Data
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavManager
+@layout MaisonTelecom.Components.Layout.AdminLayout
+@rendermode InteractiveServer
+
+<div class="admin-page-container">
+    <h2>New Repair Intake</h2>
+    <div class="form-card">
+        <EditForm Model="@NewTicket" OnValidSubmit="HandleSubmit">
+            <DataAnnotationsValidator />
+
+            <div class="form-group">
+                <label>Auto-Generated Ticket #</label>
+                <InputText @bind-Value="NewTicket.TicketNumber" class="form-control" readonly style="background:#eee;" />
+            </div>
+
+            <div class="row">
+                <div class="col">
+                    <label>Customer Name</label>
+                    <InputText @bind-Value="NewTicket.CustomerName" class="form-control" placeholder="e.g. John Doe" />
+                </div>
+                <div class="col">
+                    <label>Phone Number</label>
+                    <InputText @bind-Value="NewTicket.CustomerPhone" class="form-control" placeholder="677..." />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Device Model</label>
+                <InputText @bind-Value="NewTicket.DeviceModel" class="form-control" placeholder="e.g. Samsung S21 Ultra" />
+            </div>
+
+            <div class="form-group">
+                <label>Issue Description</label>
+                <InputTextArea @bind-Value="NewTicket.IssueDescription" class="form-control" placeholder="Cracked screen, battery swollen..." />
+            </div>
+
+            <div class="form-group">
+                <label>Estimated Cost (FCFA)</label>
+                <InputNumber @bind-Value="NewTicket.EstimatedCost" class="form-control" />
+            </div>
+
+            <div class="form-group">
+                <label>Internal Notes (Private)</label>
+                <InputTextArea @bind-Value="NewTicket.InternalNotes" class="form-control" placeholder="Any scratches before opening? Risk of screen breaking?" />
+            </div>
+
+            <button type="submit" class="save-btn">Create Ticket</button>
+        </EditForm>
+    </div>
+</div>
+
+<style>
+    .form-card {
+        background: white;
+        padding: 30px;
+        border-radius: 10px;
+        max-width: 600px;
+        margin-top: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    .row {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 15px;
+    }
+
+    .col {
+        flex: 1;
+    }
+
+    .save-btn {
+        width: 100%;
+        padding: 12px;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1.1rem;
+        cursor: pointer;
+    }
+</style>
+
+@code {
+    private RepairTicket NewTicket = new();
+
+    protected override void OnInitialized()
+    {
+        // Auto-generate a random 4-digit ticket number
+        var random = new Random();
+        NewTicket.TicketNumber = "REP-" + random.Next(1000, 9999).ToString();
+    }
+
+    private async Task HandleSubmit()
+    {
+        DbContext.RepairTickets.Add(NewTicket);
+        await DbContext.SaveChangesAsync();
+        NavManager.NavigateTo("/admin/repairs");
+    }
+}

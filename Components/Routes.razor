@@ -1,15 +1,40 @@
-﻿@inject IJSRuntime JSRuntime
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using MaisonTelecom.Components.Layout
+@inject IJSRuntime JSRuntime
 
-<Router AppAssembly="typeof(Program).Assembly">
+@* Added OnNavigateAsync handler here *@
+<Router AppAssembly="typeof(Program).Assembly" OnNavigateAsync="@OnNavigateAsync">
     <Found Context="routeData">
-        <RouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)" />
+        @* Security Wrapper: Checks if user is allowed to see the page *@
+        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(MainLayout)">
+            <NotAuthorized>
+                @* If not logged in, show Login page instead of "Not Authorized" *@
+                @if (context.User.Identity?.IsAuthenticated != true)
+                {
+                    <MaisonTelecom.Components.Pages.Admin.Login />
+                }
+                else
+                {
+                    <p role="alert">You are not authorized to access this resource.</p>
+                }
+            </NotAuthorized>
+        </AuthorizeRouteView>
         <FocusOnNavigate RouteData="routeData" Selector="h1" />
     </Found>
 </Router>
+
 @code {
     private async Task OnNavigateAsync(NavigationContext args)
     {
-        // This calls the JavaScript function after every page navigation
-        await JSRuntime.InvokeVoidAsync("scrollToTop");
+        // Scroll to top on every navigation
+        // Make sure you have window.scrollToTop = () => window.scrollTo(0,0); in your site.js
+        try
+        {
+            await JSRuntime.InvokeVoidAsync("scrollTo(0,0)");
+        }
+        catch
+        {
+            // Ignore JS errors during navigation
+        }
     }
 }

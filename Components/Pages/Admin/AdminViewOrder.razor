@@ -1,0 +1,110 @@
+﻿@page "/admin/order/{Id:int}"
+@rendermode InteractiveServer
+@layout MaisonTelecom.Components.Layout.AdminLayout
+
+@using MaisonTelecom.Data
+@using MaisonTelecom.Models
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavigationManager
+
+<div class="admin-page-container">
+    <h1 class="admin-page-title">Order Details</h1>
+    <div class="admin-content-box">
+        @if (order == null)
+        {
+            <p>Loading order details...</p>
+        }
+        else
+        {
+            <div class="admin-content-header">
+                <h2>Customer Info</h2>
+                <button class="back-btn" @onclick="GoBack">Back</button>
+            </div>
+
+            @* Handle Guest Checkout (No Customer Account) *@
+            @if (order.Customer != null)
+            {
+                <p><strong>Name:</strong> @order.Customer.FirstName @order.Customer.LastName</p>
+                <p><strong>Phone:</strong> @order.Customer.PhoneNumber</p>
+            }
+            else
+            {
+                <p><strong>Name:</strong> @order.CustomerName (Guest)</p>
+                <p><strong>Phone:</strong> @order.PhoneNumber</p>
+            }
+
+            <p><strong>Order Date:</strong> @order.OrderDate.ToString("dd/MM/yyyy")</p>
+
+            @if (order.Customer != null && !string.IsNullOrWhiteSpace(order.Customer.TownCity))
+            {
+                <p>
+                    <strong>Shipping To:</strong> @order.Customer.TownCity
+                    @if (!string.IsNullOrWhiteSpace(order.Customer.Address1))
+                    {
+                        <span>, @order.Customer.Address1</span>
+                    }
+                </p>
+            }
+            else if (!string.IsNullOrEmpty(order.ShippingAddress))
+            {
+                <p><strong>Shipping To:</strong> @order.ShippingAddress</p>
+            }
+
+            <div class="admin-content-header">
+                <h2>Order Info</h2>
+            </div>
+            <div class="admin-table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>S/N</th>
+                            <th>Product</th>
+                            <th>Quantity</th>
+                            <th>Price</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var (item, index) in order.OrderItems.Select((value, i) => (value, i)))
+                        {
+                            <tr>
+                                <td>@(index + 1)</td>
+                                <td>@item.ProductName</td>
+                                <td>@item.Quantity</td>
+                                <td>@item.Price.ToString("N0") FCFA</td>
+                                <td>@((item.Quantity * item.Price).ToString("N0")) FCFA</td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="text-align: right; margin-top: 1rem;">
+                <p><strong>Subtotal:</strong> @order.Subtotal.ToString("N0") FCFA</p>
+                <p><strong>Shipping:</strong> @order.ShippingCost.ToString("N0") FCFA</p>
+                <p class="total"><strong>Total:</strong> @order.TotalPrice.ToString("N0") FCFA</p>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private Order order;
+
+    protected override async Task OnInitializedAsync()
+    {
+        order = await DbContext.Orders
+            .Include(o => o.Customer)
+            .Include(o => o.OrderItems)
+            .FirstOrDefaultAsync(o => o.Id == Id);
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/admin/orders");
+    }
+}

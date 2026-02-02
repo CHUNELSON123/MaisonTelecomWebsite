@@ -1,0 +1,330 @@
+﻿@page "/check-status"
+@using MaisonTelecom.Models
+@using MaisonTelecom.Data
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavManager
+@rendermode InteractiveServer
+
+<div class="repair-status-container">
+    <div class="status-hero">
+        <h1>Track Your Repair</h1>
+        <p class="sub-text">Enter your Ticket Number to see exactly where your device is.</p>
+    </div>
+
+    <div class="search-box-card">
+        <label>Repair Ticket Number</label>
+        <div class="input-group">
+            <input @bind="TicketNumber" @bind:event="oninput" @onkeypress="HandleKeyPress" placeholder="e.g., REP-1024" class="ticket-input" />
+            <button @onclick="SearchTicket" class="track-btn">
+                @if (IsLoading)
+                {
+                    <span>Loading...</span>
+                }
+                else
+                {
+
+                    <span>Track Device</span>
+                }
+            </button>
+        </div>
+    </div>
+
+    @if (ShowResult && FoundTicket != null)
+    {
+        <div class="result-card fade-in">
+
+            @* --- NEW: Visual Progress Bar --- *@
+            <div class="progress-track">
+                <ul class="progressbar">
+                    <li class="@GetStepClass("Received", FoundTicket.Status)">Received</li>
+                    <li class="@GetStepClass("In Progress", FoundTicket.Status)">On Bench</li>
+                    <li class="@GetStepClass("Ready", FoundTicket.Status)">Ready</li>
+                    <li class="@GetStepClass("Completed", FoundTicket.Status)">Picked Up</li>
+                </ul>
+            </div>
+
+            <div class="status-header @GetStatusColor(FoundTicket.Status)">
+                <i class="@GetStatusIcon(FoundTicket.Status)"></i>
+                <h2>@GetFriendlyStatus(FoundTicket.Status)</h2>
+            </div>
+
+            <div class="ticket-details">
+                <div class="detail-row">
+                    <span class="label">Device:</span> <span class="value">@FoundTicket.DeviceModel</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Issue:</span> <span class="value">@FoundTicket.IssueDescription</span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Est. Cost:</span> <span class="value">@FoundTicket.EstimatedCost.ToString("N0") FCFA</span>
+                </div>
+            </div>
+
+            <div class="technician-notes">
+                <h3>Technician's Report</h3>
+                <p>
+                    @if (string.IsNullOrEmpty(FoundTicket.TechnicianPublicNotes))
+                    {
+                        <em>No updates yet. Your device is safe in our queue.</em>
+                    }
+                    else
+                    {
+                        @FoundTicket.TechnicianPublicNotes
+                    }
+                </p>
+            </div>
+
+            @if (FoundTicket.Status == "Ready" || FoundTicket.Status == "Completed")
+            {
+                <div class="action-area" style="padding:20px;">
+                    <a href="https://wa.me/237671007313?text=I%20am%20coming%20to%20collect%20ticket%20@FoundTicket.TicketNumber" target="_blank" class="whatsapp-btn">
+                        <i class="fab fa-whatsapp"></i> Contact Us for Pickup
+                    </a>
+                </div>
+            }
+        </div>
+    }
+    else if (ShowResult && FoundTicket == null)
+    {
+        <div class="error-card fade-in" style="margin-top:20px; text-align:center; color:#dc3545; background:#fff; padding:20px; border-radius:10px;">
+            <i class="fas fa-exclamation-circle"></i>
+            <p>Ticket number not found. Please check your receipt.</p>
+        </div>
+    }
+</div>
+
+<style>
+    /* --- NEW Progress Bar Styles --- */
+    .progress-track {
+        padding: 30px 10px 10px 10px;
+        background: white;
+    }
+
+    .progressbar {
+        counter-reset: step;
+        padding: 0;
+        display: flex;
+        justify-content: space-between;
+        list-style-type: none;
+    }
+
+        .progressbar li {
+            width: 25%;
+            float: left;
+            position: relative;
+            text-align: center;
+            font-size: 0.8rem;
+            color: #777;
+        }
+
+            .progressbar li:before {
+                content: counter(step);
+                counter-increment: step;
+                width: 30px;
+                height: 30px;
+                line-height: 26px;
+                border: 2px solid #ddd;
+                display: block;
+                text-align: center;
+                margin: 0 auto 10px auto;
+                border-radius: 50%;
+                background-color: white;
+            }
+
+            .progressbar li:after {
+                content: '';
+                position: absolute;
+                width: 100%;
+                height: 2px;
+                background-color: #ddd;
+                top: 15px;
+                left: -50%;
+                z-index: -1;
+            }
+
+            .progressbar li:first-child:after {
+                content: none;
+            }
+
+            /* Active State */
+            .progressbar li.active {
+                color: #2ecc71;
+                font-weight: bold;
+            }
+
+                .progressbar li.active:before {
+                    border-color: #2ecc71;
+                    background: #2ecc71;
+                    color: white;
+                    content: '\2713';
+                }
+                /* Checkmark */
+                .progressbar li.active + li:after {
+                    background-color: #2ecc71;
+                }
+    /* Line color */
+
+    /* Existing Styles */
+    .repair-status-container {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 20px;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    .status-hero {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .search-box-card {
+        background: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        text-align: center;
+    }
+
+    .ticket-input {
+        width: 100%;
+        padding: 15px;
+        font-size: 1.2rem;
+        border: 2px solid #eee;
+        border-radius: 8px;
+        margin-bottom: 15px;
+        text-transform: uppercase;
+    }
+
+    .track-btn {
+        width: 100%;
+        padding: 15px;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .result-card {
+        background: white;
+        margin-top: 30px;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    }
+
+    .status-header {
+        padding: 20px;
+        text-align: center;
+        color: white;
+    }
+
+        .status-header.blue {
+            background: #3498db;
+        }
+
+        .status-header.orange {
+            background: #e67e22;
+        }
+
+        .status-header.green {
+            background: #2ecc71;
+        }
+
+        .status-header.grey {
+            background: #95a5a6;
+        }
+
+    .ticket-details {
+        padding: 20px;
+        border-bottom: 1px solid #eee;
+    }
+
+    .detail-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 1.1rem;
+    }
+
+    .technician-notes {
+        padding: 20px;
+        background: #f9f9f9;
+    }
+
+    .whatsapp-btn {
+        display: block;
+        background: #25D366;
+        color: white;
+        text-align: center;
+        padding: 15px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 1.1rem;
+    }
+
+    .fade-in {
+        animation: fadeIn 0.5s;
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+</style>
+
+@code {
+    private string TicketNumber { get; set; }
+    private RepairTicket? FoundTicket { get; set; }
+    private bool ShowResult { get; set; } = false;
+    private bool IsLoading { get; set; } = false;
+
+    private async Task HandleKeyPress(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter") await SearchTicket();
+    }
+
+    private async Task SearchTicket()
+    {
+        if (string.IsNullOrWhiteSpace(TicketNumber)) return;
+        IsLoading = true;
+        ShowResult = false;
+        await Task.Delay(800);
+        FoundTicket = await DbContext.RepairTickets.FirstOrDefaultAsync(t => t.TicketNumber.ToLower() == TicketNumber.ToLower());
+        ShowResult = true;
+        IsLoading = false;
+    }
+
+    private string GetFriendlyStatus(string status) => status switch
+    {
+        "Received" => "Checked In & Safe",
+        "In Progress" => "On the Bench - Diagnosing",
+        "WaitingForParts" => "Waiting for Authentic Parts",
+        "Ready" => "Restored & Ready",
+        "Completed" => "Picked Up by Customer",
+        _ => status
+    };
+
+    private string GetStatusColor(string status) => status switch { "Received" => "grey", "In Progress" => "orange", "Ready" => "green", "Completed" => "blue", _ => "grey" };
+    private string GetStatusIcon(string status) => status switch { "Received" => "fas fa-clipboard-check", "In Progress" => "fas fa-microscope", "Ready" => "fas fa-check-circle", "Completed" => "fas fa-hand-holding-heart", _ => "fas fa-circle" };
+
+    // Logic for Progress Bar CSS
+    private string GetStepClass(string stepName, string currentStatus)
+    {
+        // Define logical order
+        int currentLevel = currentStatus switch { "Received" => 1, "In Progress" => 2, "WaitingForParts" => 2, "Ready" => 3, "Completed" => 4, _ => 0 };
+        int stepLevel = stepName switch { "Received" => 1, "In Progress" => 2, "Ready" => 3, "Completed" => 4, _ => 0 };
+
+        return stepLevel <= currentLevel ? "active" : "";
+    }
+}

@@ -3,25 +3,38 @@
     border: 1px solid #eee;
     border-radius: 8px;
     background: #fff;
-    display: flex; /* Using Flexbox for a flexible layout */
+    display: flex;
     flex-direction: column;
-    height: 100%; /* Important: makes the card fill its container in the shop grid */
+    height: 100%;
     overflow: hidden;
     box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    transition: box-shadow 0.3s ease;
 }
+
+    .product-card-wrapper:hover {
+        box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+    }
 
 /* Container for the image and icons */
 .product-image-container {
     position: relative;
     width: 100%;
+    background-color: #fff;
+    overflow: hidden; /* Ensures the image doesn't spill out */
 }
 
     .product-image-container img {
         width: 100%;
         display: block;
-        aspect-ratio: 1 / 1; /* This is the key: creates a perfect square that scales */
-        object-fit: cover; /* Ensures the image fills the square without distortion */
+        aspect-ratio: 1 / 1;
+        object-fit: contain;
+        transition: transform 0.5s ease;
     }
+
+/* Subtle zoom effect on hover for professionalism */
+.product-card-wrapper:hover .product-image-container img {
+    transform: scale(1.05);
+}
 
 /* Link for the details section */
 .product-details-link {
@@ -31,7 +44,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    flex-grow: 1; /* Allows this section to fill the remaining vertical space */
+    flex-grow: 1;
     overflow: hidden;
 }
 
@@ -41,15 +54,25 @@
     text-overflow: ellipsis;
 }
 
-/* --- YOUR ICON AND TOOLTIP STYLES (UNCHANGED) --- */
+/* --- ICONS AND PROFESSIONAL TOOLTIPS --- */
 .card-actions {
     position: absolute;
-    bottom: 0;
+    bottom: 10px;
     left: 0;
     right: 0;
     display: flex;
-    justify-content: space-between;
-    padding: 12px;
+    justify-content: center; /* Center icons for better look */
+    gap: 15px; /* Space between icons */
+    padding: 0;
+    opacity: 0; /* Hide icons by default */
+    transform: translateY(20px); /* Push them down slightly */
+    transition: all 0.3s ease;
+}
+
+/* Show icons when hovering the card */
+.product-card-wrapper:hover .card-actions {
+    opacity: 1;
+    transform: translateY(0);
 }
 
 .icon-container {
@@ -62,39 +85,99 @@
         justify-content: center;
         width: 40px;
         height: 40px;
-        background-color: #1E40AF;
-        color: white !important;
+        background-color: #fff; /* White background looks cleaner on images */
+        color: #1E40AF !important; /* Blue Icon */
         border-radius: 50%;
-        font-size: 1em;
-        transition: transform 0.2s ease, background-color 0.2s ease;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        font-size: 1.1em;
+        transition: all 0.2s ease;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.15);
         cursor: pointer;
     }
 
         .icon-container a:hover {
-            transform: scale(1.1);
-            background-color: #0056b3;
+            background-color: #1E40AF;
+            color: white !important;
+            transform: translateY(-3px); /* Slight lift on hover */
         }
 
+    /* --- PROFESSIONAL TOOLTIP STYLE --- */
     .icon-container .tooltip-text {
         visibility: hidden;
-        width: 120px;
         background-color: #333;
         color: #fff;
         text-align: center;
-        border-radius: 6px;
-        padding: 5px 0;
+        border-radius: 4px;
+        padding: 6px 12px;
         position: absolute;
         z-index: 10;
-        bottom: 140%;
+        bottom: 125%; /* Position above icon */
         left: 50%;
-        margin-left: -60px;
+        transform: translateX(-50%) translateY(10px); /* Start slightly lower for animation */
         opacity: 0;
-        transition: opacity 0.3s;
+        transition: opacity 0.3s, transform 0.3s;
         font-size: 12px;
+        white-space: nowrap;
+        font-weight: 500;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        pointer-events: none; /* Prevents tooltip from blocking clicks */
     }
+
+        /* Tooltip Arrow (Little triangle at bottom) */
+        .icon-container .tooltip-text::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #333 transparent transparent transparent;
+        }
 
     .icon-container:hover .tooltip-text {
         visibility: visible;
         opacity: 1;
+        transform: translateX(-50%) translateY(0); /* Slide up into place */
     }
+
+/* ========================================= */
+/* MOBILE & TABLET OPTIMIZATIONS       */
+/* ========================================= */
+
+/* 1. UNIVERSAL FIX: Show icons on ALL touch devices (Note 8, Tablets, iPhone) */
+/* Targets any screen smaller than a laptop OR any device without a mouse */
+@media (max-width: 1024px), (hover: none) {
+    .card-actions {
+        opacity: 1 !important; /* Force visibility */
+        transform: translateY(0) !important; /* Move to correct position */
+        padding-bottom: 5px;
+        background: rgba(255, 255, 255, 0.7); /* Subtle background so icons pop */
+        bottom: 0;
+    }
+
+    /* Hide tooltips on mobile since you can't hover */
+    .icon-container .tooltip-text {
+        display: none !important;
+    }
+}
+
+/* 2. SIZE FIX: Make cards bigger on Small Screens (iPhone 6, SE, etc.) */
+/* This forces the container to use less padding, giving the card more room */
+@media (max-width: 500px) {
+
+    /* Target common container names to reduce edge spacing */
+    .container,
+    .wishlist-container,
+    .services-container,
+    .main-layout {
+        padding-left: 10px !important; /* Reduced from 20px */
+        padding-right: 10px !important;
+    }
+
+    /* Force the card to take up 100% of the available width */
+    .product-card-wrapper {
+        width: 100%;
+        /* If using a grid, this ensures the card fills its cell completely */
+        min-width: 0;
+    }
+}

@@ -1,0 +1,178 @@
+﻿@page "/admin/attributes"
+@layout MaisonTelecom.Components.Layout.AdminLayout
+@using MaisonTelecom.Services
+@inject ProductService ProductService
+@rendermode InteractiveServer
+
+<div class="admin-page-container">
+    <h1 class="admin-page-title">Manage Product Attributes</h1>
+
+    <div class="admin-content-box">
+
+        @* --- TABS --- *@
+        <div class="attr-tabs">
+            @foreach (var type in AttributeTypes)
+            {
+                <button class="@(SelectedType == type ? "active" : "")"
+                        @onclick="() => SelectType(type)">
+                    @type
+                </button>
+            }
+        </div>
+
+        <div class="attr-body">
+            <h3>Manage @SelectedType</h3>
+
+            @* --- ADD NEW FORM --- *@
+            <div class="add-form">
+                <input type="text" @bind="NewValue" placeholder="Enter new @SelectedType..." />
+                <button class="btn-add" @onclick="AddValue">+ Add</button>
+            </div>
+
+            @* --- LIST --- *@
+            <div class="value-list">
+                @if (CurrentValues == null)
+                {
+                    <p>Loading...</p>
+                }
+                else if (!CurrentValues.Any())
+                {
+                    <p class="text-muted">No items found for @SelectedType.</p>
+                }
+                else
+                {
+                    @foreach (var val in CurrentValues)
+                    {
+                        <div class="value-item">
+                            <span>@val</span>
+                            <button class="btn-delete" @onclick="() => DeleteValue(val)">×</button>
+                        </div>
+                    }
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .attr-tabs {
+        display: flex;
+        gap: 10px;
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+        overflow-x: auto;
+    }
+
+        .attr-tabs button {
+            border: none;
+            background: #f8f9fa;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            color: #555;
+            white-space: nowrap;
+        }
+
+            .attr-tabs button.active {
+                background: #007bff;
+                color: white;
+            }
+
+    .add-form {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+        .add-form input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+    .btn-add {
+        background: #28a745;
+        color: white;
+        border: none;
+        padding: 0 20px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .value-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 10px;
+    }
+
+    .value-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        border: 1px solid #eee;
+        padding: 10px;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    .btn-delete {
+        background: #dc3545;
+        color: white;
+        border: none;
+        width: 25px;
+        height: 25px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>
+
+@code {
+    private string SelectedType = "Category";
+    private string NewValue = "";
+    private List<string> CurrentValues = new();
+
+    // The list of things you want to manage
+    private List<string> AttributeTypes = new()
+    {
+        "Category", "Brand", "RAM", "ROM", "Processor", "Display"
+    };
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadValues();
+    }
+
+    private async Task SelectType(string type)
+    {
+        SelectedType = type;
+        await LoadValues();
+    }
+
+    private async Task LoadValues()
+    {
+        CurrentValues = await ProductService.GetAttributeValuesAsync(SelectedType);
+    }
+
+    private async Task AddValue()
+    {
+        if (!string.IsNullOrWhiteSpace(NewValue))
+        {
+            await ProductService.AddAttributeAsync(SelectedType, NewValue);
+            NewValue = "";
+            await LoadValues();
+        }
+    }
+
+    private async Task DeleteValue(string val)
+    {
+        await ProductService.DeleteAttributeAsync(SelectedType, val);
+        await LoadValues();
+    }
+}

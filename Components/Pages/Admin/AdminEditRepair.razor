@@ -1,0 +1,169 @@
+﻿@page "/admin/repairs/edit/{Id:int}"
+@using MaisonTelecom.Models
+@using MaisonTelecom.Data
+@inject ApplicationDbContext DbContext
+@inject NavigationManager NavManager
+@layout MaisonTelecom.Components.Layout.AdminLayout
+@rendermode InteractiveServer
+
+<div class="admin-page-container">
+    <div class="header-row">
+        <h2>Manage Ticket: @Ticket.TicketNumber</h2>
+        <button @onclick="DeleteTicket" class="delete-btn">Delete</button>
+    </div>
+
+    @if (Ticket != null)
+    {
+        <EditForm Model="@Ticket" OnValidSubmit="HandleUpdate">
+            <div class="status-panel">
+                <label>Current Status:</label>
+                <InputSelect @bind-Value="Ticket.Status" class="status-select">
+                    <option value="Checked In">Checked In</option>
+                    <option value="In Progress">In Progress (On Bench)</option>
+                    <option value="WaitingForParts">Waiting for Parts</option>
+                    <option value="Ready">Ready for Pickup</option>
+                    <option value="Completed">Completed & Paid</option>
+                </InputSelect>
+            </div>
+
+            <div class="split-view">
+                <div class="panel left">
+                    <h3>Technician Notes (Visible to Customer)</h3>
+                    <p class="hint">Write this professionally. The customer sees this.</p>
+                    <InputTextArea @bind-Value="Ticket.TechnicianPublicNotes" class="form-control note-box" placeholder="e.g. Screen replaced successfully. Running final touch tests." />
+                </div>
+
+                <div class="panel right">
+                    <h3>Internal Notes (Private)</h3>
+                    <p class="hint">For your eyes only.</p>
+                    <InputTextArea @bind-Value="Ticket.InternalNotes" class="form-control note-box" />
+                </div>
+            </div>
+
+            <div class="cost-section">
+                <label>Final Cost (FCFA)</label>
+                <InputNumber @bind-Value="Ticket.FinalCost" class="form-control" />
+            </div>
+
+            <button type="submit" class="update-btn">Update Ticket</button>
+        </EditForm>
+    }
+    else
+    {
+        <p>Loading...</p>
+    }
+</div>
+
+<style>
+    .header-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .delete-btn {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .status-panel {
+        background: #e3f2fd;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        border: 1px solid #90caf9;
+    }
+
+    .status-select {
+        font-size: 1.2rem;
+        padding: 8px;
+        border-radius: 5px;
+        width: 100%;
+    }
+
+    .split-view {
+        display: flex;
+        gap: 20px;
+        margin-bottom: 20px;
+    }
+
+    .panel {
+        flex: 1;
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+        .panel.left {
+            border-top: 4px solid #2ecc71;
+        }
+        /* Green for Public */
+        .panel.right {
+            border-top: 4px solid #e74c3c;
+        }
+    /* Red for Private */
+
+    .hint {
+        font-size: 0.8rem;
+        color: #666;
+        font-style: italic;
+    }
+
+    .note-box {
+        height: 150px;
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+    }
+
+    .update-btn {
+        width: 100%;
+        padding: 15px;
+        background: #007bff;
+        color: white;
+        font-size: 1.2rem;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+    }
+</style>
+
+@code {
+    [Parameter] public int Id { get; set; }
+    private RepairTicket Ticket { get; set; } = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        Ticket = await DbContext.RepairTickets.FindAsync(Id);
+    }
+
+    private async Task HandleUpdate()
+    {
+        if (Ticket.Status == "Completed" && Ticket.DateCompleted == null)
+        {
+            Ticket.DateCompleted = DateTime.Now;
+        }
+
+        DbContext.RepairTickets.Update(Ticket);
+        await DbContext.SaveChangesAsync();
+        NavManager.NavigateTo("/admin/repairs");
+    }
+
+    private async Task DeleteTicket()
+    {
+        if (await JsRuntime.InvokeAsync<bool>("confirm", "Are you sure you want to delete this ticket?"))
+        {
+            DbContext.RepairTickets.Remove(Ticket);
+            await DbContext.SaveChangesAsync();
+            NavManager.NavigateTo("/admin/repairs");
+        }
+    }
+
+    [Inject] IJSRuntime JsRuntime { get; set; }
+}

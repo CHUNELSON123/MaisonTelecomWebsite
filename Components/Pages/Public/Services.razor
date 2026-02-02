@@ -1,0 +1,119 @@
+﻿@page "/services"
+@using MaisonTelecom.Models
+@using MaisonTelecom.Services
+@inject ProductService ProductService
+@rendermode InteractiveServer
+
+<PageTitle>Software Services - Maison Telecom</PageTitle>
+
+@* Link to the CSS file *@
+<link href="css/service.css" rel="stylesheet" />
+
+<div class="services-container">
+
+    @* --- HERO SECTION --- *@
+    <div class="services-hero">
+        <div class="hero-content">
+            <h1>We Don't Fix Hardware.<br /><span>We Fix The Brain.</span></h1>
+            <p>Advanced software diagnostics using premium industry-standard software for all mobile brands.</p>
+            <a href="https://wa.me/237670000000" target="_blank" class="cta-button">
+                <i class="fab fa-whatsapp"></i> Chat with a Technician
+            </a>
+        </div>
+        <div class="hero-subtitle">
+            <h2>Our Core Services</h2>
+            <div class="underline-white"></div>
+        </div>
+    </div>
+
+    @* --- MAIN SERVICES GRID (Dynamic) --- *@
+    <div class="services-grid">
+        @if (ServiceList == null)
+        {
+            <div style="text-align:center; padding: 40px; color: white;">
+                <p>Loading services...</p>
+            </div>
+        }
+        else if (!ServiceList.Any())
+        {
+            <div style="text-align:center; padding: 40px; color: white;">
+                <p>No services added yet.</p>
+            </div>
+        }
+        else
+        {
+            @foreach (var service in ServiceList)
+            {
+                <div class="service-card">
+                    <div class="icon-box">
+                        @* 1. Check if an Image was uploaded *@
+                        @if (!string.IsNullOrEmpty(service.ImageURL1))
+                        {
+                            <img src="@service.ImageURL1" style="width:100%; height:100%; object-fit:contain; padding:10px;" />
+                        }
+                        @* 2. Else, use the Font Icon (or default to wrench) *@
+                        else
+                        {
+                            <i class="@(string.IsNullOrEmpty(service.IconClass) ? "fas fa-wrench" : service.IconClass)"></i>
+                        }
+                    </div>
+
+                    <h3>@service.Name</h3>
+                    <p>@service.BasicSpecs</p> @* Description *@
+
+                    @* Bullet Points *@
+                    @if (!string.IsNullOrEmpty(service.SpecialFeatures))
+                    {
+                        <ul class="service-list">
+                            @foreach (var feature in service.SpecialFeatures.Split(new[] { ',', '\n' }, StringSplitOptions.RemoveEmptyEntries))
+                            {
+                                <li><i class="fas fa-check"></i> @feature.Trim()</li>
+                            }
+                        </ul>
+                    }
+
+                    @* Only show price if it's set to something meaningful (e.g., > 100) *@
+                    @if (service.Price > 100)
+                    {
+                        <div style="margin-top:auto; padding-top:15px; font-weight:bold; color:#007bff;">
+                            Starts at: @service.Price.ToString("N0") CFA
+                        </div>
+                    }
+                </div>
+            }
+        }
+    </div>
+
+    @* --- HOW IT WORKS --- *@
+    <div class="process-section">
+        <h2>How It Works</h2>
+        <div class="process-steps">
+            <div class="step">
+                <span class="step-number">01</span>
+                <h4>Diagnose</h4>
+                <p>Send us your model number. We check if it's supported by our server.</p>
+            </div>
+            <div class="step">
+                <span class="step-number">02</span>
+                <h4>Quote</h4>
+                <p>We confirm if it can be done remotely or needs a physical connection.</p>
+            </div>
+            <div class="step">
+                <span class="step-number">03</span>
+                <h4>Unlock</h4>
+                <p>We run the software operation. You pay only when the device is active.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    // FIX: Use full namespace to avoid conflict with Product.razor
+    private List<MaisonTelecom.Models.Product> ServiceList;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Use the ProductService to fetch items marked as 'Service'
+        ServiceList = await ProductService.GetServicesAsync();
+    }
+}

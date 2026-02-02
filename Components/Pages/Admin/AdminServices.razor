@@ -1,0 +1,173 @@
+﻿@page "/admin/services"
+@using MaisonTelecom.Data
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext dbContext
+@inject NavigationManager NavigationManager
+@layout MaisonTelecom.Components.Layout.AdminLayout
+@rendermode InteractiveServer
+
+<div class="admin-page-container">
+    <div class="header-row" style="display:flex; justify-content:space-between; margin-bottom:20px;">
+        <h1 class="admin-page-title">Manage Services</h1>
+        <a href="/admin/services/add" class="add-btn">+ Add New Service</a>
+    </div>
+
+    <div class="admin-content-box">
+        <table class="table admin-table">
+            <thead>
+                <tr>
+                    <th style="width: 35%;">Service Name</th>
+                    <th style="width: 15%;">Category</th>
+                    <th style="width: 20%;">Price Range</th>
+                    <th style="width: 10%;">Popular?</th>
+                    <th style="width: 20%;">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var service in Services)
+                {
+                    <tr>
+                        <td>
+                            <strong>@service.Name</strong><br />
+                            <small style="color:#666;">@service.BasicSpecs</small>
+                        </td>
+                        <td>
+                            <span class="badge @(service.ProductCategory == "Hardware" ? "badge-hw" : "badge-sw")">
+                                @service.ProductCategory
+                            </span>
+                        </td>
+                        <td>
+                            @if (service.MaxPrice.HasValue && service.MaxPrice > service.Price)
+                            {
+                                <span>@service.Price.ToString("N0") - @service.MaxPrice.Value.ToString("N0")</span>
+                            }
+                            else
+                            {
+                                <span>@service.Price.ToString("N0")</span>
+                            }
+                            <small> CFA</small>
+                        </td>
+                        <td>@(service.IsTrending ? "Yes" : "No")</td>
+                        <td>
+                            <a href="/admin/services/edit/@service.Id" class="btn-edit">Edit</a>
+                            <button @onclick="() => DeleteService(service)" class="btn-delete">Delete</button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        @if (!Services.Any())
+        {
+            <p style="text-align:center; padding:20px;">No services added yet. Click "Add New Service" to start.</p>
+        }
+    </div>
+</div>
+
+<style>
+    .btn-edit {
+        background: #007bff;
+        color: white;
+        padding: 5px 15px;
+        border-radius: 4px;
+        text-decoration: none;
+        margin-right: 5px;
+        font-size: 0.9rem;
+    }
+
+    .btn-delete {
+        background: #dc3545;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 0.9rem;
+    }
+    .add-btn {
+        background: #007bff;
+        color: white;
+        padding: 10px 15px;
+        text-decoration: none;
+        border-radius: 5px;
+        font-weight: bold;
+    }
+
+    .admin-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+        .admin-table th, .admin-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            text-align: left;
+        }
+
+    .badge {
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 0.8rem;
+        color: white;
+    }
+
+    .badge-hw {
+        background: #e67e22;
+    }
+    /* Orange for Hardware */
+    .badge-sw {
+        background: #9b59b6;
+    }
+    /* Purple for Software */
+    .btn-delete {
+        background: #e74c3c;
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+</style>
+
+@code {
+    // FIX: Explicitly use 'MaisonTelecom.Models.Product' to avoid confusion with the Product.razor page
+    private List<MaisonTelecom.Models.Product> Services = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        // FIX: Ensure we are using the Model Enum type
+        Services = await dbContext.Products
+            .Where(p => p.Type == MaisonTelecom.Models.ProductType.Service)
+            .ToListAsync();
+    }
+
+    // FIX: Update parameter type here as well
+    private async Task DeleteService(MaisonTelecom.Models.Product service)
+    {
+        bool confirmed = await JsRuntime.InvokeAsync<bool>("confirm", $"Are you sure you want to delete '{service.Name}'?");
+        if (confirmed)
+        {
+            dbContext.Products.Remove(service);
+            await dbContext.SaveChangesAsync();
+
+            // Refresh list
+            Services = await dbContext.Products
+                .Where(p => p.Type == MaisonTelecom.Models.ProductType.Service)
+                .ToListAsync();
+        }
+    }
+
+    private string GetCategoryColor(string? category)
+    {
+        return category switch
+        {
+            "Hardware" => "#e67e22", // Orange
+            "Unlock" => "#e74c3c",   // Red
+            "Software" => "#9b59b6", // Purple
+            "WebDev" => "#3498db",   // Blue
+            _ => "#95a5a6"           // Grey
+        };
+    }
+
+    [Inject] IJSRuntime JsRuntime { get; set; }
+}
