@@ -15,7 +15,8 @@ builder.Services.AddCascadingAuthenticationState();
 // -----------------------------------------------------------------
 
 // 1. Database Connection
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 
 // Register Factory for Blazor Components
 builder.Services.AddDbContextFactory<ApplicationDbContext>(options =>
@@ -78,5 +79,25 @@ app.MapControllers();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
+
+// --------------------------------------------------------------------
+// CRITICAL: Auto-Create Database Tables on Startup (For Render)
+// --------------------------------------------------------------------
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<ApplicationDbContext>();
+        // This runs the "update-database" command automatically
+        context.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating the database.");
+    }
+}
+// --------------------------------------------------------------------
 
 app.Run();
