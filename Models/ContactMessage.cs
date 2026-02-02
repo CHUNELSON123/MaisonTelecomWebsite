@@ -19,5 +19,6 @@ namespace MaisonTelecom.Models
         public string Message { get; set; }
 
         public DateTime DateSubmitted { get; set; } = DateTime.UtcNow;
+        public DateTime DateSent { get; set; } = DateTime.UtcNow;
     }
 }

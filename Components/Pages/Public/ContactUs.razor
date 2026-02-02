@@ -1,40 +1,89 @@
 ﻿@page "/contactus"
- 
- 
+@using MaisonTelecom.Models
+@using MaisonTelecom.Services
+@inject SiteSettingsService SettingsService
+@rendermode InteractiveServer
 
 <div class="contact-us-container">
     <h1>Contact Us</h1>
     <div class="contact-us-content">
         <div class="get-in-touch">
             <h2>Get In Touch</h2>
-            <p>Here at Maillot, we prioritize customer satisfaction which is why we have a support system that's available 24/7 to tend to all of your needs.</p>
+            <p>Here at Maison Telecom, we prioritize customer satisfaction which is why we have a support system that's available 24/7 to tend to all of your needs.</p>
             <ul>
-                <li><i class="fas fa-phone"></i> +237 690 05 91 97</li>
-                <li><i class="fab fa-whatsapp"></i> +237 90059197</li>
+                <li><i class="fas fa-phone"></i> @CallNumber</li>
+
+                <li><i class="fab fa-whatsapp"></i> @WhatsAppNumber</li>
+
                 <li><i class="fas fa-envelope"></i> maisontelecom@gmail.com</li>
                 <li><i class="fas fa-map-marker-alt"></i> Douala, Cameroon</li>
             </ul>
             <h3>Social Links</h3>
             <div class="social-links">
-                <a href="#"><i class="fab fa-instagram"></i></a>
-                <a href="#"><i class="fab fa-tiktok"></i></a>
-                <a href="#"><i class="fab fa-telegram-plane"></i></a>
+                <a href="@InstagramUrl" target="_blank"><i class="fab fa-instagram"></i></a>
+                <a href="@TikTokUrl" target="_blank"><i class="fab fa-tiktok"></i></a>
+                <a href="@FacebookUrl" target="_blank"><i class="fab fa-facebook-f"></i></a>
+                <a href="https://wa.me/@WhatsAppNumber" target="_blank"><i class="fab fa-whatsapp"></i></a>
             </div>
         </div>
         <div class="send-message">
             <h2>Send Us A Message</h2>
-            <form>
+
+            <EditForm Model="@contactMessage" OnValidSubmit="HandleValidSubmit">
+                <DataAnnotationsValidator />
+
                 <div class="form-group">
-                    <input type="text" placeholder="Name" />
+                    <InputText @bind-Value="contactMessage.Name" placeholder="Name" />
+                    <ValidationMessage For="@(() => contactMessage.Name)" />
                 </div>
                 <div class="form-group">
-                    <input type="email" placeholder="E-Mail" />
+                    <InputText @bind-Value="contactMessage.Email" placeholder="E-Mail" />
+                    <ValidationMessage For="@(() => contactMessage.Email)" />
                 </div>
                 <div class="form-group">
-                    <textarea placeholder="Message"></textarea>
+                    <InputTextArea @bind-Value="contactMessage.Message" placeholder="Message" />
+                    <ValidationMessage For="@(() => contactMessage.Message)" />
                 </div>
+
                 <button type="submit">SUBMIT</button>
-            </form>
+
+                @if (isSubmitted)
+                {
+                    <p style="color: green; margin-top: 10px; font-weight: bold;">Message sent successfully!</p>
+                }
+            </EditForm>
         </div>
     </div>
 </div>
+
+@code {
+    private ContactMessage contactMessage = new();
+    private bool isSubmitted = false;
+
+    // Default values if DB is empty
+    private string CallNumber = "+237 690 05 91 97";
+    private string WhatsAppNumber = "23790059197";
+    private string FacebookUrl = "#";
+    private string TikTokUrl = "#";
+    private string InstagramUrl = "#";
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Load settings from the Admin Database
+        CallNumber = await SettingsService.GetSettingAsync("CallNumber", "+237 690 05 91 97");
+        WhatsAppNumber = await SettingsService.GetSettingAsync("WhatsAppNumber", "23790059197");
+        FacebookUrl = await SettingsService.GetSettingAsync("FacebookUrl", "https://facebook.com/maisonelectronique");
+        TikTokUrl = await SettingsService.GetSettingAsync("TikTokUrl", "https://www.tiktok.com/@maisontelecom5");
+        InstagramUrl = await SettingsService.GetSettingAsync("InstagramUrl", "#");
+    }
+
+    private void HandleValidSubmit()
+    {
+        contactMessage.DateSent = DateTime.UtcNow;
+        // Logic to save to DB goes here if needed later
+        isSubmitted = true;
+
+        // Reset form
+        contactMessage = new ContactMessage();
+    }
+}

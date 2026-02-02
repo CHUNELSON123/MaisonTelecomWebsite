@@ -64,7 +64,7 @@
 
             <div class="payment-section">
                 <h2>Complete Order</h2>
-                <p>Click below to send your order details directly to us on WhatsApp.</p>
+                <p>Click below to send your order details directly to us on WhatsApp. Delivery fees will be discussed.</p>
             </div>
 
             <button type="submit" class="pay-now-button action-button whatsapp-order-button">
@@ -96,11 +96,11 @@
             <hr />
             <div class="summary-total">
                 <p>Subtotal: @State.Cart.Sum(i => i.Quantity) items <span>FCFA @Subtotal.ToString("N0")</span></p>
-                <p>Shipping <span>FCFA @ShippingCost.ToString("N0")</span></p>
+                <p style="font-size: 0.9em; color: #666;">* Delivery fee depends on location</p>
             </div>
             <hr />
             <div class="summary-grand-total">
-                <p>Total <span>FCFA @((Subtotal + ShippingCost).ToString("N0"))</span></p>
+                <p>Total (Excl. Delivery) <span>FCFA @(Subtotal.ToString("N0"))</span></p>
             </div>
         }
         else
@@ -113,7 +113,8 @@
 @code {
     private CheckoutViewModel checkoutModel = new();
     private decimal Subtotal => State.Cart.Any() ? State.Cart.Sum(item => item.Product.Price * item.Quantity) : 0;
-    private const decimal ShippingCost = 6000;
+
+    // REMOVED: private const decimal ShippingCost = 6000;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -127,7 +128,6 @@
     protected override void OnInitialized()
     {
         State.OnStateChange += StateHasChanged;
-        // ERROR FIXED: Removed the assignment to checkoutModel.PaymentMethod
     }
 
     private async Task OrderViaWhatsApp()
@@ -150,12 +150,12 @@
         }
 
         var subtotal = Subtotal;
-        var shippingCost = ShippingCost;
-        var total = subtotal + shippingCost;
+        // REMOVED: Shipping calculation
 
         orderSummary += $"\nSubtotal: FCFA {subtotal:N0}\n";
-        orderSummary += $"Shipping: FCFA {shippingCost:N0}\n";
-        orderSummary += $"Total: FCFA {total:N0}";
+        // ADDED: Note about delivery
+        orderSummary += "Delivery Fee: To be discussed based on location\n";
+        orderSummary += $"Total (Excl. Delivery): FCFA {subtotal:N0}";
 
         var customerDetails = $"Name: {checkoutModel.FirstName} {checkoutModel.LastName}\n" +
                               $"Phone: {checkoutModel.PhoneNumber}\n";

@@ -7,6 +7,38 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="wwwroot\app.css" />
+    <None Include="wwwroot\bootstrap\bootstrap.min.css" />
+    <None Include="wwwroot\bootstrap\bootstrap.min.css.map" />
+    <None Include="wwwroot\css\aboutus.css" />
+    <None Include="wwwroot\css\admin.css" />
+    <None Include="wwwroot\css\cart.css" />
+    <None Include="wwwroot\css\checkoutwithoutshipping.css" />
+    <None Include="wwwroot\css\checkoutwithshipping.css" />
+    <None Include="wwwroot\css\contactus.css" />
+    <None Include="wwwroot\css\home.css" />
+    <None Include="wwwroot\css\product.css" />
+    <None Include="wwwroot\css\productcard.css" />
+    <None Include="wwwroot\css\service.css" />
+    <None Include="wwwroot\css\shop.css" />
+    <None Include="wwwroot\css\wishlist.css" />
+    <None Include="wwwroot\favicon.png" />
+    <None Include="wwwroot\Image\barca.jpeg" />
+    <None Include="wwwroot\Image\maisonlogo.jpg" />
+    <None Include="wwwroot\Image\masonhero.png" />
+    <None Include="wwwroot\Image\MOMO.jpeg" />
+    <None Include="wwwroot\Image\OrangeMoney.jpeg" />
+    <None Include="wwwroot\Image\products\0319be92-b581-4b74-a4e5-8cf963120ee5.png" />
+    <None Include="wwwroot\Image\products\33fac1bf-8527-4f73-a86c-3cb2d2f216ef.png" />
+    <None Include="wwwroot\Image\products\34ff7cbb-b98a-43b2-82f9-4001824abc12.jpg" />
+    <None Include="wwwroot\Image\products\359d71a3-08d5-4f72-b611-9d35491fe237.png" />
+    <None Include="wwwroot\Image\products\6313b880-4c6c-4739-acd4-25f624a9b47f.png" />
+    <None Include="wwwroot\Image\products\7321203c-6142-4022-a793-20bdd92383bb.png" />
+    <None Include="wwwroot\Image\products\8e6bb088-e0f8-4a02-b710-96864dab6b15.png" />
+    <None Include="wwwroot\js\site.js" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.0">

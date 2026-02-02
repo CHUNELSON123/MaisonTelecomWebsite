@@ -53,7 +53,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<BasketState>();
 builder.Services.AddScoped<StateContainer>();
 builder.Services.AddHttpContextAccessor();
-
+builder.Services.AddScoped<SiteSettingsService>();
 // 5. Add Controllers WITH Views
 builder.Services.AddControllersWithViews();
 

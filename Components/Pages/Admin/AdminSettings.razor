@@ -1,0 +1,102 @@
+﻿@page "/admin/settings"
+@using MaisonTelecom.Services
+@layout MaisonTelecom.Components.Layout.AdminLayout
+@inject SiteSettingsService SettingsService
+@inject IJSRuntime JSRuntime
+@rendermode InteractiveServer
+
+<div class="admin-container">
+    <h2>Site Configuration</h2>
+
+    @if (isLoading)
+    {
+        <p>Loading settings...</p>
+    }
+    else
+    {
+        <div class="settings-form">
+            <div class="form-group">
+                <label>Call / Support Number</label>
+                <input class="form-control" @bind="CallNumber" placeholder="+237 6..." />
+            </div>
+
+            <div class="form-group">
+                <label>WhatsApp Number (No spaces/symbols)</label>
+                <input class="form-control" @bind="WhatsAppNumber" placeholder="2376..." />
+                <small>Used for the 'Order on WhatsApp' button.</small>
+            </div>
+
+            <hr />
+
+            <h3>Social Media Links</h3>
+            <div class="form-group">
+                <label>Facebook URL</label>
+                <input class="form-control" @bind="FacebookUrl" />
+            </div>
+            <div class="form-group">
+                <label>TikTok URL</label>
+                <input class="form-control" @bind="TikTokUrl" />
+            </div>
+            <div class="form-group">
+                <label>Instagram URL</label>
+                <input class="form-control" @bind="InstagramUrl" />
+            </div>
+
+            <button class="btn btn-primary mt-3" @onclick="SaveSettings">Save Changes</button>
+        </div>
+    }
+</div>
+
+<style>
+    .admin-container {
+        padding: 20px;
+        max-width: 800px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+</style>
+
+@code {
+    private bool isLoading = true;
+    private string CallNumber = "";
+    private string WhatsAppNumber = "";
+    private string FacebookUrl = "";
+    private string TikTokUrl = "";
+    private string InstagramUrl = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        CallNumber = await SettingsService.GetSettingAsync("CallNumber", "+237 671 00 73 13");
+        WhatsAppNumber = await SettingsService.GetSettingAsync("WhatsAppNumber", "237671007313");
+        FacebookUrl = await SettingsService.GetSettingAsync("FacebookUrl", "https://facebook.com/maisonelectronique");
+        TikTokUrl = await SettingsService.GetSettingAsync("TikTokUrl", "https://www.tiktok.com/@maisontelecom5?_r=1&_t=ZS-93akyqsw1vl");
+        InstagramUrl = await SettingsService.GetSettingAsync("InstagramUrl", "#");
+        isLoading = false;
+    }
+
+    private async Task SaveSettings()
+    {
+        await SettingsService.SetSettingAsync("CallNumber", CallNumber);
+        await SettingsService.SetSettingAsync("WhatsAppNumber", WhatsAppNumber);
+        await SettingsService.SetSettingAsync("FacebookUrl", FacebookUrl);
+        await SettingsService.SetSettingAsync("TikTokUrl", TikTokUrl);
+        await SettingsService.SetSettingAsync("InstagramUrl", InstagramUrl);
+
+        await JSRuntime.InvokeVoidAsync("alert", "Settings Saved Successfully!");
+    }
+}

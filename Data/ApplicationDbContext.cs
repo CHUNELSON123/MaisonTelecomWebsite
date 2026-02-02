@@ -23,5 +23,6 @@ namespace MaisonTelecom.Data
         public DbSet<RepairTicket> RepairTickets { get; set; }
         public DbSet<ProductAttribute> ProductAttributes { get; set; }
         public DbSet<Review> Reviews { get; set; }
+        public DbSet<SiteSetting> SiteSettings { get; set; }
     }
 }

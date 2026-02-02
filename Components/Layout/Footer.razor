@@ -1,22 +1,38 @@
-﻿<footer class="app-footer">
+﻿@using MaisonTelecom.Services
+@inject SiteSettingsService SettingsService
+@implements IDisposable
+
+<footer class="app-footer">
     <div class="social-icons">
-        <a href="#"><i class="fab fa-instagram"></i></a>
-        <a href="#"><i class="fab fa-facebook-f"></i></a>
-        <a href="#"><i class="fab fa-tiktok"></i></a>
-        <a href="#"><i class="fab fa-whatsapp"></i></a>
+        <a href="@InstagramUrl" target="_blank"><i class="fab fa-instagram"></i></a>
+        <a href="@FacebookUrl" target="_blank"><i class="fab fa-facebook-f"></i></a>
+        <a href="@TikTokUrl" target="_blank"><i class="fab fa-tiktok"></i></a>
+        <a href="https://wa.me/@WhatsAppNumber" target="_blank"><i class="fab fa-whatsapp"></i></a>
     </div>
     <div class="footer-links">
         <a href="/aboutus">About Us</a>
         <a href="/contactus">Contact Us</a>
-        <a href="#">Delivery</a>
-         
+        <a href="/delivery">Delivery</a>
     </div>
     <div class="copyright">
-        © copyright 2025 Maison Telecom
+        © copyright @DateTime.Now.Year Maison Telecom
     </div>
-     
 </footer>
 
 @code {
+    private string FacebookUrl = "#";
+    private string TikTokUrl = "#";
+    private string InstagramUrl = "#";
+    private string WhatsAppNumber = "";
 
+    protected override async Task OnInitializedAsync()
+    {
+        // These will load the settings we created in the Admin panel
+        FacebookUrl = await SettingsService.GetSettingAsync("FacebookUrl", "https://facebook.com/maisonelectronique");
+        TikTokUrl = await SettingsService.GetSettingAsync("TikTokUrl", "https://www.tiktok.com/@maisontelecom5?_r=1&_t=ZS-93akyqsw1vl");
+        InstagramUrl = await SettingsService.GetSettingAsync("InstagramUrl", "#");
+        WhatsAppNumber = await SettingsService.GetSettingAsync("WhatsAppNumber", "237671007313");
+    }
+
+    public void Dispose() { }
 }

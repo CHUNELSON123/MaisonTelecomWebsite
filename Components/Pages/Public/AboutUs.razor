@@ -1,6 +1,6 @@
 ﻿@page "/aboutus"
-
- 
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
 
 <div class="about-us-container">
     <h1>About the “Maison Telecom” Store</h1>
@@ -17,7 +17,9 @@
         <p>At Maison Telecom, we see ourselves not just as a shop, but as part of the digital lifestyle. Every device we deliver is a gateway—to opportunity, creativity, and connection. That's why we work hard to combine quality products, reliable service, and a strong commitment to our customers.</p>
         <p><strong>Maison Telecom – Get connected. Stay powered. Live smarter.</strong></p>
     </div>
-    <button class="shop-now-btn">Shop Our Store</button>
+
+    <button class="shop-now-btn" @onclick="NavigateToShop">Shop Our Store</button>
+
     <div class="quote-section">
         <blockquote>
             "Technology is not just a tool; it's the bridge to your ambitions, the power in your hands, and the connection to your world."
@@ -25,3 +27,10 @@
         <p><strong>Maison Telecom Team</strong></p>
     </div>
 </div>
+
+@code {
+    private void NavigateToShop()
+    {
+        NavigationManager.NavigateTo("/shop");
+    }
+}
