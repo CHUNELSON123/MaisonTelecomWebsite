@@ -2,12 +2,13 @@
 @using MaisonTelecom.Models
 @using MaisonTelecom.Services
 @inject ProductService ProductService
+@inject SiteSettingsService SettingsService
 @rendermode InteractiveServer
 
 <PageTitle>Software Services - Maison Telecom</PageTitle>
 
-@* Link to the CSS file *@
-<link href="css/service.css" rel="stylesheet" />
+@* Link to the CSS file (Updated to absolute path) *@
+<link href="/css/service.css" rel="stylesheet" />
 
 <div class="services-container">
 
@@ -16,7 +17,9 @@
         <div class="hero-content">
             <h1>We Don't Fix Hardware.<br /><span>We Fix The Brain.</span></h1>
             <p>Advanced software diagnostics using premium industry-standard software for all mobile brands.</p>
-            <a href="https://wa.me/237670000000" target="_blank" class="cta-button">
+
+            @* FIX: Use the Dynamic WhatsApp Number here *@
+            <a href="https://wa.me/@WhatsAppNumber" target="_blank" class="cta-button">
                 <i class="fab fa-whatsapp"></i> Chat with a Technician
             </a>
         </div>
@@ -108,12 +111,15 @@
 </div>
 
 @code {
-    // FIX: Use full namespace to avoid conflict with Product.razor
     private List<MaisonTelecom.Models.Product> ServiceList;
+    private string WhatsAppNumber = ""; // Variable for the dynamic number
 
     protected override async Task OnInitializedAsync()
     {
-        // Use the ProductService to fetch items marked as 'Service'
+        // 1. Fetch the Dynamic WhatsApp Number from Settings
+        WhatsAppNumber = await SettingsService.GetSettingAsync("WhatsAppNumber", "237671007313");
+
+        // 2. Fetch Services
         ServiceList = await ProductService.GetServicesAsync();
     }
 }
