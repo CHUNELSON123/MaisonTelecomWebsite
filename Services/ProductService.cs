@@ -76,18 +76,16 @@ namespace MaisonTelecom.Services
             }
         }
 
-        // NEW METHOD: Updates an attribute value (e.g., corrects a typo)
+        // FIXED: Added UpdateAttributeAsync to support editing
         public async Task UpdateAttributeAsync(string type, string oldValue, string newValue)
         {
             using var context = await _factory.CreateDbContextAsync();
-
-            // 1. Find the existing attribute
             var attr = await context.ProductAttributes
                 .FirstOrDefaultAsync(a => a.Type == type && a.Value == oldValue);
 
-            // 2. Ensure it exists and the NEW value doesn't already exist (prevent duplicates)
             if (attr != null)
             {
+                // Prevent duplicates
                 bool exists = await context.ProductAttributes
                     .AnyAsync(a => a.Type == type && a.Value == newValue);
 

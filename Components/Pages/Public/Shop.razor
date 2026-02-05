@@ -13,6 +13,8 @@
         <div class="filter-bar">
             <a href="/"><i class="fas fa-home"></i></a>
 
+            @* REMOVED THE LOCAL SEARCH BAR HERE AS REQUESTED *@
+
             <div class="sort-container">
                 <button class="filter-btn" @onclick="ToggleBrandMenu">
                     @(string.IsNullOrEmpty(selectedBrandFilter) ? "All Brands" : selectedBrandFilter)
@@ -53,6 +55,8 @@
         <h1>@(string.IsNullOrEmpty(Search) ? (string.IsNullOrEmpty(selectedBrandFilter) ? "All Products" : $"{selectedBrandFilter} Products") : $"Results for '{Search}'")</h1>
 
         <div class="category-filters">
+            @* "All" button allows resetting category filter manually *@
+            <button class="@(string.IsNullOrEmpty(selectedCategory) ? "active" : "")" @onclick='() => FilterByCategory(null)'>All</button>
             <button class="@(selectedCategory == "Phones" ? "active" : "")" @onclick='() => FilterByCategory("Phones")'>Phones</button>
             <button class="@(selectedCategory == "Laptops" ? "active" : "")" @onclick='() => FilterByCategory("Laptops")'>Laptops</button>
             <button class="@(selectedCategory == "Accessories" ? "active" : "")" @onclick='() => FilterByCategory("Accessories")'>Accessories</button>
@@ -71,7 +75,11 @@
             }
             else
             {
-                <p style="padding: 20px; width: 100%; text-align: center;">No products found.</p>
+                <div style="padding: 40px; width: 100%; text-align: center; color: #666;">
+                    <i class="fas fa-search" style="font-size: 2em; margin-bottom: 15px; color: #ccc;"></i>
+                    <p>No products found matching "@Search".</p>
+                    <button class="filter-btn" style="margin-top:10px; display:inline-block;" @onclick="ClearAllFilters">Clear Filters</button>
+                </div>
             }
         }
         else
@@ -105,7 +113,7 @@
 </div>
 
 <style>
-    /* Reuse the exact same styles as the Sort button */
+    /* Sort and Filter Styles */
     .sort-container {
         position: relative;
         display: inline-block;
@@ -146,12 +154,11 @@
             margin-right: 10px;
         }
 
-    /* Ensure filter-btn styling is consistent */
     .filter-btn {
         background: white;
         border: 1px solid #ddd;
         padding: 8px 15px;
-        border-radius: 20px; /* Matching the rounded look usually found in shop filters */
+        border-radius: 20px;
         cursor: pointer;
         font-size: 0.9rem;
         display: flex;
@@ -176,8 +183,9 @@
     private int TotalPages;
 
     private bool showSortMenu = false;
-    private bool showBrandMenu = false; // NEW: Toggle for Brand Menu
+    private bool showBrandMenu = false;
 
+    // Default to "Phones" only if no search is active
     private string selectedCategory = "Phones";
     private string selectedBrandFilter = null;
     private string currentSortOption = "latest";
@@ -187,10 +195,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        // 1. Fetch Dynamic Brands from Database
         BrandOptions = await ProductService.GetAttributeValuesAsync("Brand");
-
-        // 2. Load Recently Viewed
         RecentlyViewedProducts = await dbContext.Products
             .Where(p => p.Type == MaisonTelecom.Models.ProductType.Physical)
             .OrderByDescending(p => p.Id)
@@ -200,38 +205,33 @@
 
     protected override async Task OnParametersSetAsync()
     {
+        // LOGIC: If a Search term exists (e.g. from the header), we must RESET the category
+        // so that the search looks through EVERYTHING, not just "Phones".
         if (!string.IsNullOrEmpty(Search))
         {
             selectedCategory = null;
-            selectedBrandFilter = null;
         }
-        else if (string.IsNullOrEmpty(selectedCategory) && string.IsNullOrEmpty(selectedBrandFilter))
+        else if (string.IsNullOrEmpty(selectedCategory))
         {
+            // If no search and no category, default back to Phones
             selectedCategory = "Phones";
         }
 
         await UpdateProductList();
     }
 
-    // NEW: Toggle Brand Menu
     private void ToggleBrandMenu()
     {
         showBrandMenu = !showBrandMenu;
-        if (showBrandMenu) showSortMenu = false; // Close sort if brand opens
+        if (showBrandMenu) showSortMenu = false;
     }
 
-    // NEW: Select Brand Logic
     private async Task SelectBrand(string brand)
     {
-        if (string.IsNullOrEmpty(brand))
-        {
-            await ClearBrandFilter();
-        }
-        else
-        {
-            await FilterByBrand(brand);
-        }
-        showBrandMenu = false; // Close menu after selection
+        selectedBrandFilter = brand;
+        showBrandMenu = false;
+        CurrentPage = 1;
+        await UpdateProductList();
     }
 
     private async Task UpdateProductList()
@@ -240,26 +240,30 @@
             .Where(p => p.Type == MaisonTelecom.Models.ProductType.Physical)
             .AsQueryable();
 
-        // 1. Search
+        // 1. Search Logic (Moved to Top Priority)
+        // This ensures "sam" matches "Samsung" using ToLower() for case-insensitivity
         if (!string.IsNullOrEmpty(Search))
         {
+            var lowerSearch = Search.ToLower();
             query = query.Where(p =>
-                p.Name.Contains(Search) ||
-                p.Brand.Contains(Search) ||
-                p.ProductCategory.Contains(Search));
+                p.Name.ToLower().Contains(lowerSearch) ||
+                p.Brand.ToLower().Contains(lowerSearch) ||
+                p.ProductCategory.ToLower().Contains(lowerSearch));
         }
-        // 2. Brand Filter
-        else if (!string.IsNullOrEmpty(selectedBrandFilter))
-        {
-            query = query.Where(p => p.Brand == selectedBrandFilter);
-        }
-        // 3. Category Filter
-        else if (!string.IsNullOrEmpty(selectedCategory))
+
+        // 2. Category Filter (Only if not null)
+        if (!string.IsNullOrEmpty(selectedCategory))
         {
             query = query.Where(p => p.ProductCategory == selectedCategory);
         }
 
-        // 4. Sorting Logic
+        // 3. Brand Filter
+        if (!string.IsNullOrEmpty(selectedBrandFilter))
+        {
+            query = query.Where(p => p.Brand == selectedBrandFilter);
+        }
+
+        // 4. Sorting
         switch (currentSortOption)
         {
             case "price_asc":
@@ -286,7 +290,7 @@
     private void ToggleSortMenu()
     {
         showSortMenu = !showSortMenu;
-        if (showSortMenu) showBrandMenu = false; // Close brand if sort opens
+        if (showSortMenu) showBrandMenu = false;
     }
 
     private async Task ApplySort(string sortOption)
@@ -316,25 +320,14 @@
     private async Task FilterByCategory(string category)
     {
         selectedCategory = category;
-        selectedBrandFilter = null;
-        Search = null;
+        // Do NOT clear Search here to allow searching INSIDE a category
         CurrentPage = 1;
-        NavigationManager.NavigateTo("/shop");
         await UpdateProductList();
     }
 
-    private async Task FilterByBrand(string brand)
+    private async Task ClearAllFilters()
     {
-        selectedBrandFilter = brand;
-        selectedCategory = null;
         Search = null;
-        CurrentPage = 1;
-        NavigationManager.NavigateTo("/shop");
-        await UpdateProductList();
-    }
-
-    private async Task ClearBrandFilter()
-    {
         selectedBrandFilter = null;
         selectedCategory = "Phones";
         await UpdateProductList();

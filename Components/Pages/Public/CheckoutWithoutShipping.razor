@@ -10,10 +10,7 @@
 
 <div class="checkout-page">
     <div class="checkout-form">
-        @* CHANGED: OnValidSubmit -> OnSubmit (Ignores validation) *@
         <EditForm Model="@checkoutModel" OnSubmit="OrderViaWhatsApp">
-            @* REMOVED: <DataAnnotationsValidator /> *@
-
             <div class="delivery-section">
                 <h2>Delivery</h2>
                 <div class="delivery-options">
@@ -56,11 +53,14 @@
         {
             @foreach (var item in State.Cart)
             {
+                decimal effectivePrice = (item.Product.PromoPrice > 0 && item.Product.PromoPrice < item.Product.Price)
+                ? item.Product.PromoPrice.Value
+                : item.Product.Price;
                 <div class="summary-item">
                     <img src="@(string.IsNullOrEmpty(item.Product.ImageURL1) ? "/Image/iphone_thumb.jpg" : item.Product.ImageURL1)" alt="@item.Product.Name" />
                     <div>
                         <p>@item.Product.Name</p>
-                        <p>FCFA @item.Product.Price.ToString("N0")</p>
+                        <p>FCFA @effectivePrice.ToString("N0")</p>
                         <div class="quantity-controls">
                             <button type="button" @onclick="() => DecrementQuantity(item)">-</button>
                             <span>@item.Quantity</span>
@@ -88,7 +88,14 @@
 
 @code {
     private CheckoutViewModel checkoutModel = new();
-    private decimal Subtotal => State.Cart.Any() ? State.Cart.Sum(item => item.Product.Price * item.Quantity) : 0;
+
+    // UPDATED Subtotal Calculation
+    private decimal Subtotal => State.Cart.Any()
+        ? State.Cart.Sum(item =>
+            ((item.Product.PromoPrice > 0 && item.Product.PromoPrice < item.Product.Price)
+                ? item.Product.PromoPrice.Value
+                : item.Product.Price) * item.Quantity)
+        : 0;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -110,7 +117,10 @@
         var itemNumber = 1;
         foreach (var item in State.Cart)
         {
-            orderSummary += $"{itemNumber}. {item.Product.Name} (Quantity: {item.Quantity}) - FCFA {item.Product.Price:N0}\n";
+            decimal price = (item.Product.PromoPrice > 0 && item.Product.PromoPrice < item.Product.Price)
+                            ? item.Product.PromoPrice.Value
+                            : item.Product.Price;
+            orderSummary += $"{itemNumber}. {item.Product.Name} (Quantity: {item.Quantity}) - FCFA {price:N0}\n";
             itemNumber++;
         }
 
