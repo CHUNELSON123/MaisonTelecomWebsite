@@ -43,9 +43,25 @@
                 {
                     @foreach (var val in CurrentValues)
                     {
-                        <div class="value-item">
-                            <span>@val</span>
-                            <button class="btn-delete" @onclick="() => DeleteValue(val)">×</button>
+                        <div class="value-item @(EditingItem == val ? "editing-mode" : "")">
+                            @if (EditingItem == val)
+                            {
+                                @* EDIT MODE *@
+                                <input @bind="TempEditValue" class="form-control" style="flex:1; margin-right:10px;" />
+                                <div class="actions">
+                                    <button class="btn-save" @onclick="SaveEdit" title="Save"><i class="fas fa-check"></i></button>
+                                    <button class="btn-cancel" @onclick="CancelEdit" title="Cancel"><i class="fas fa-times"></i></button>
+                                </div>
+                            }
+                            else
+                            {
+                                @* READ MODE *@
+                                <span>@val</span>
+                                <div class="actions">
+                                    <button class="btn-edit" @onclick="() => StartEdit(val)" title="Edit"><i class="fas fa-pen"></i></button>
+                                    <button class="btn-delete" @onclick="() => DeleteValue(val)" title="Delete">×</button>
+                                </div>
+                            }
                         </div>
                     }
                 }
@@ -73,6 +89,7 @@
             font-weight: bold;
             color: #555;
             white-space: nowrap;
+            transition: all 0.2s;
         }
 
             .attr-tabs button.active {
@@ -100,12 +117,13 @@
         padding: 0 20px;
         border-radius: 5px;
         cursor: pointer;
+        font-weight: bold;
     }
 
     .value-list {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 10px;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 15px;
     }
 
     .value-item {
@@ -114,31 +132,71 @@
         align-items: center;
         background: white;
         border: 1px solid #eee;
-        padding: 10px;
-        border-radius: 5px;
+        padding: 10px 15px;
+        border-radius: 8px;
         box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        height: 50px; /* Keep height consistent */
     }
 
-    .btn-delete {
-        background: #dc3545;
-        color: white;
-        border: none;
-        width: 25px;
-        height: 25px;
+        .value-item.editing-mode {
+            border: 1px solid #007bff;
+            background: #f0f8ff;
+        }
+
+    .actions {
+        display: flex;
+        gap: 5px;
+    }
+
+    /* Button Styles */
+    .btn-delete, .btn-edit, .btn-save, .btn-cancel {
+        width: 30px;
+        height: 30px;
         border-radius: 50%;
-        cursor: pointer;
+        border: none;
         display: flex;
         align-items: center;
         justify-content: center;
+        cursor: pointer;
+        font-size: 0.9em;
+        transition: transform 0.1s;
     }
+
+        .btn-delete:hover, .btn-edit:hover, .btn-save:hover, .btn-cancel:hover {
+            transform: scale(1.1);
+        }
+
+    .btn-delete {
+        background: #fee;
+        color: #dc3545;
+    }
+
+    .btn-edit {
+        background: #eef;
+        color: #007bff;
+    }
+
+    .btn-save {
+        background: #efe;
+        color: #28a745;
+    }
+
+    .btn-cancel {
+        background: #eee;
+        color: #666;
+    }
+
 </style>
 
 @code {
-    private string SelectedType = "Category";
+    private string SelectedType = "Brand"; // Changed default to Brand as it's more common
     private string NewValue = "";
     private List<string> CurrentValues = new();
 
-    // The list of things you want to manage
+    // Editing State
+    private string? EditingItem = null; // Which item are we editing?
+    private string TempEditValue = "";  // What is the new text?
+
     private List<string> AttributeTypes = new()
     {
         "Category", "Brand", "RAM", "ROM", "Processor", "Display"
@@ -152,6 +210,7 @@
     private async Task SelectType(string type)
     {
         SelectedType = type;
+        CancelEdit(); // Stop editing if switching tabs
         await LoadValues();
     }
 
@@ -172,7 +231,37 @@
 
     private async Task DeleteValue(string val)
     {
-        await ProductService.DeleteAttributeAsync(SelectedType, val);
-        await LoadValues();
+        bool confirm = true; // In a real app, you might want a JS confirm dialog here
+        if (confirm)
+        {
+            await ProductService.DeleteAttributeAsync(SelectedType, val);
+            await LoadValues();
+        }
+    }
+
+    // --- EDIT FUNCTIONS ---
+
+    private void StartEdit(string val)
+    {
+        EditingItem = val;
+        TempEditValue = val;
+    }
+
+    private void CancelEdit()
+    {
+        EditingItem = null;
+        TempEditValue = "";
+    }
+
+    private async Task SaveEdit()
+    {
+        if (!string.IsNullOrWhiteSpace(TempEditValue) && EditingItem != null)
+        {
+            // Call the new service method
+            await ProductService.UpdateAttributeAsync(SelectedType, EditingItem, TempEditValue);
+
+            EditingItem = null;
+            await LoadValues();
+        }
     }
 }

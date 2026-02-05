@@ -76,6 +76,29 @@ namespace MaisonTelecom.Services
             }
         }
 
+        // NEW METHOD: Updates an attribute value (e.g., corrects a typo)
+        public async Task UpdateAttributeAsync(string type, string oldValue, string newValue)
+        {
+            using var context = await _factory.CreateDbContextAsync();
+
+            // 1. Find the existing attribute
+            var attr = await context.ProductAttributes
+                .FirstOrDefaultAsync(a => a.Type == type && a.Value == oldValue);
+
+            // 2. Ensure it exists and the NEW value doesn't already exist (prevent duplicates)
+            if (attr != null)
+            {
+                bool exists = await context.ProductAttributes
+                    .AnyAsync(a => a.Type == type && a.Value == newValue);
+
+                if (!exists)
+                {
+                    attr.Value = newValue;
+                    await context.SaveChangesAsync();
+                }
+            }
+        }
+
         public async Task DeleteAttributeAsync(string type, string value)
         {
             using var context = await _factory.CreateDbContextAsync();
@@ -87,7 +110,7 @@ namespace MaisonTelecom.Services
             }
         }
 
-        // --- REVIEW METHODS (Fixes missing definition error) ---
+        // --- REVIEW METHODS ---
         public async Task<List<Review>> GetRecentReviewsAsync()
         {
             using var context = await _factory.CreateDbContextAsync();
