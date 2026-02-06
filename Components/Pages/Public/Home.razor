@@ -40,13 +40,24 @@
         </div>
     </section>
 
-    @* --- Latest Products --- *@
+    @* --- Latest Products (UPDATED: DYNAMIC CATEGORIES) --- *@
     <section class="product-section">
         <h2>Latest Products</h2>
-        <div class="category-filters mb-3">
-            <button class="btn @(selectedCategory == "Phones" ? "active" : "")" @onclick='() => LoadLatestProducts("Phones")'>Phones</button>
-            <button class="btn @(selectedCategory == "Laptops" ? "active" : "")" @onclick='() => LoadLatestProducts("Laptops")'>Laptops</button>
-            <button class="btn @(selectedCategory == "Accessories" ? "active" : "")" @onclick='() => LoadLatestProducts("Accessories")'>Accessories</button>
+        <div class="category-filters mb-3" style="display:flex; flex-wrap:wrap;">
+            @if (AvailableCategories.Any())
+            {
+                @foreach (var category in AvailableCategories)
+                {
+                    <button class="btn @(selectedCategory == category ? "active" : "")"
+                            @onclick='() => LoadLatestProducts(category)'>
+                        @category
+                    </button>
+                }
+            }
+            else
+            {
+                <p class="text-muted">Loading categories...</p>
+            }
         </div>
         <div class="product-carousel">
             @if (LatestProducts.Any())
@@ -55,6 +66,10 @@
                 {
                     <ProductCard Product="product" />
                 }
+            }
+            else
+            {
+                <p class="text-muted p-3">No latest products found for @selectedCategory.</p>
             }
         </div>
     </section>
@@ -163,7 +178,7 @@
 }
 
 <style>
-    /* UPDATED: Height set to 800px */
+    /* UPDATED: Height set to 500px */
     .hero-section {
         position: relative;
         height: 500px;
@@ -347,10 +362,13 @@
     private List<MaisonTelecom.Models.Product> LatestProducts = new();
     private List<MaisonTelecom.Models.Product> BrandProducts = new();
     private List<Review> CustomerReviews = new();
+
+    // UPDATED: Lists for Dynamic Loading
     private List<string> AvailableBrands = new();
+    private List<string> AvailableCategories = new();
 
     private string selectedBrand = "";
-    private string selectedCategory = "Phones";
+    private string selectedCategory = ""; // Start empty, fill dynamically
 
     private bool isReviewModalOpen = false;
     private string newReviewerName = "";
@@ -359,14 +377,27 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // 1. Load Categories Dynamically
+        AvailableCategories = await ProductService.GetAttributeValuesAsync("Category");
+
+        // Default to "Phones" if available, else first item, else empty
+        if (AvailableCategories.Contains("Phones"))
+            selectedCategory = "Phones";
+        else if (AvailableCategories.Any())
+            selectedCategory = AvailableCategories.First();
+
+        // 2. Load Brands Dynamically
         AvailableBrands = await ProductService.GetAttributeValuesAsync("Brand");
         if (AvailableBrands.Any())
             selectedBrand = AvailableBrands.First();
         else
             selectedBrand = "Apple";
 
+        // 3. Load Products
         TrendingProducts = await ProductService.GetTrendingProductsAsync();
-        await LoadLatestProducts(selectedCategory);
+
+        if (!string.IsNullOrEmpty(selectedCategory))
+            await LoadLatestProducts(selectedCategory);
 
         if (!string.IsNullOrEmpty(selectedBrand))
             await LoadBrandProducts(selectedBrand);
@@ -405,7 +436,6 @@
     private void OpenReviewModal() => isReviewModalOpen = true;
     private void CloseReviewModal() => isReviewModalOpen = false;
     private void SetRating(int rating) => newReviewRating = rating;
-
     private async Task SubmitReview()
     {
         if (string.IsNullOrWhiteSpace(newReviewerName) || string.IsNullOrWhiteSpace(newReviewText))
@@ -421,7 +451,6 @@
             Rating = newReviewRating,
             DatePosted = DateTime.Now
         };
-
         await ProductService.AddReviewAsync(newReview);
         isReviewModalOpen = false;
         await JSRuntime.InvokeVoidAsync("alert", "Thank you! Your review has been posted.");
