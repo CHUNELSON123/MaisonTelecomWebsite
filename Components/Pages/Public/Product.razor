@@ -49,7 +49,6 @@
         font-size: 1.5rem;
     }
 
-    /* Centering Highlights */
     .highlights-grid.centered-grid {
         display: flex;
         justify-content: center;
@@ -60,6 +59,126 @@
     .highlight-item {
         min-width: 120px;
         text-align: center;
+    }
+
+    /* --- LIGHTBOX STYLES --- */
+    .lightbox-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.95);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+        animation: fadeIn 0.3s;
+    }
+
+    .lightbox-content {
+        position: relative;
+        max-width: 85%;
+        max-height: 90%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+        .lightbox-content img {
+            max-width: 100%;
+            max-height: 90vh;
+            object-fit: contain;
+            border-radius: 4px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+        }
+
+    /* Lightbox Navigation Buttons - UPDATED FOR VISIBILITY */
+    .lightbox-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        /* Changed to dark background so white arrows show on white images */
+        background: rgba(0, 0, 0, 0.5);
+        color: white;
+        border: none;
+        font-size: 2rem;
+        padding: 1rem;
+        cursor: pointer;
+        z-index: 10001;
+        border-radius: 50%;
+        width: 60px;
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.3s;
+    }
+
+        .lightbox-nav:hover {
+            background: rgba(0, 0, 0, 0.8); /* Darker on hover */
+        }
+
+        .lightbox-nav.prev {
+            left: 20px;
+        }
+
+        .lightbox-nav.next {
+            right: 20px;
+        }
+
+    .lightbox-close {
+        position: absolute;
+        top: 20px;
+        right: 30px;
+        background: none;
+        border: none;
+        color: white;
+        font-size: 3rem;
+        cursor: pointer;
+        z-index: 10001;
+        line-height: 1;
+        text-shadow: 0 0 5px rgba(0,0,0,0.8);
+    }
+
+    @@keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+
+        to {
+            opacity: 1;
+        }
+    }
+
+    .main-image {
+        cursor: zoom-in;
+    }
+
+    /* --- MOBILE RESPONSIVE STYLES --- */
+    @@media (max-width: 768px) {
+        .lightbox-nav {
+            width: 45px;
+            height: 45px;
+            font-size: 1.2rem;
+            padding: 0;
+            /* Dark background ensures visibility on white phone images */
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+            .lightbox-nav.prev {
+                left: 10px;
+            }
+
+            .lightbox-nav.next {
+                right: 10px;
+            }
+
+        .lightbox-close {
+            top: 15px;
+            right: 15px;
+            font-size: 2.5rem;
+        }
     }
 </style>
 
@@ -74,10 +193,12 @@
                         <img src="@imageUrl" alt="@product.Name Thumbnail" @onclick="() => SetMainImage(imageUrl)" />
                     }
                 </div>
-                <div class="main-image">
+
+                <div class="main-image" @onclick="OpenLightbox">
                     <img src="@mainImageUrl" alt="@product.Name" />
                 </div>
             </div>
+
             <div class="product-info">
                 <span class="brand">@product.Brand</span>
                 <h1>@product.Name</h1>
@@ -116,106 +237,85 @@
             <div class="product-highlights">
                 <h2>Product Highlights</h2>
                 <div class="highlights-grid centered-grid">
-
                     @if (HasSpec(product.Processor))
                     {
-                        <div class="highlight-item">
-                            <i class="fas fa-microchip"></i>
-                            <span>@product.Processor</span>
-                            <small>Processor</small>
-                        </div>
+                        <div class="highlight-item"><i class="fas fa-microchip"></i><span>@product.Processor</span><small>Processor</small></div>
                     }
-
                     @if (HasSpec(product.RAM))
                     {
-                        <div class="highlight-item">
-                            <i class="fas fa-memory"></i>
-                            <span>@product.RAM</span>
-                            <small>RAM</small>
-                        </div>
+                        <div class="highlight-item"><i class="fas fa-memory"></i><span>@product.RAM</span><small>RAM</small></div>
                     }
-
                     @if (HasSpec(product.ROM))
                     {
-                        <div class="highlight-item">
-                            <i class="fas fa-sd-card"></i>
-                            <span>@product.ROM</span>
-                            <small>Storage</small>
-                        </div>
+                        <div class="highlight-item"><i class="fas fa-sd-card"></i><span>@product.ROM</span><small>Storage</small></div>
                     }
-
                     @if (HasSpec(product.Display))
                     {
-                        <div class="highlight-item">
-                            <i class="fas fa-desktop"></i>
-                            <span>@product.Display</span>
-                            <small>Display</small>
-                        </div>
+                        <div class="highlight-item"><i class="fas fa-desktop"></i><span>@product.Display</span><small>Display</small></div>
                     }
-
                 </div>
             </div>
         }
 
         <div class="tech-specs">
             <h2>Tech Specs</h2>
-            <div class="spec-item" @onclick="() => ToggleSpec(0)">
-                <span>Basic Details</span>
-                <i class="fas @(specVisibility[0] ? "fa-minus" : "fa-plus")"></i>
-            </div>
-            <div class="spec-content @(specVisibility[0] ? "show" : "")">
-                <ul>
-                    @foreach (var item in GetSpecList(product.BasicSpecs))
-                    {
-                        <li>@item</li>
-                    }
-                </ul>
-            </div>
+            <div class="spec-item" @onclick="() => ToggleSpec(0)"><span>Basic Details</span><i class="fas @(specVisibility[0] ? "fa-minus" : "fa-plus")"></i></div>
+            <div class="spec-content @(specVisibility[0] ? "show" : "")"><ul>@foreach (var item in GetSpecList(product.BasicSpecs)) {
+            <li>@item</li>
+        }
+</ul></div>
 
-            <div class="spec-item" @onclick="() => ToggleSpec(1)">
-                <span>Display Properties</span>
-                <i class="fas @(specVisibility[1] ? "fa-minus" : "fa-plus")"></i>
-            </div>
-            <div class="spec-content @(specVisibility[1] ? "show" : "")">
-                <ul>
-                    @foreach (var item in GetSpecList(product.DisplayProperties))
-                    {
-                        <li>@item</li>
-                    }
-                </ul>
-            </div>
-
-            <div class="spec-item" @onclick="() => ToggleSpec(2)">
-                <span>Special Features</span>
-                <i class="fas @(specVisibility[2] ? "fa-minus" : "fa-plus")"></i>
-            </div>
-            <div class="spec-content @(specVisibility[2] ? "show" : "")">
-                <ul>
-                    @foreach (var item in GetSpecList(product.SpecialFeatures))
-                    {
-                        <li>@item</li>
-                    }
-                </ul>
-            </div>
-        </div>
-        <div class="product-section">
-            <h2>You May Also Like</h2>
-            <div class="product-carousel">
-                @if (relatedProducts != null)
-                {
-                    @foreach (var relatedProduct in relatedProducts)
-                    {
-                        <ProductCard Product="relatedProduct" />
-                    }
+        <div class="spec-item" @onclick="() => ToggleSpec(1)"><span>Display Properties</span><i class="fas @(specVisibility[1] ? "fa-minus" : "fa-plus")"></i></div>
+        <div class="spec-content @(specVisibility[1] ? "show" : "")"><ul>@foreach (var item in GetSpecList(product.DisplayProperties)) {
+        <li>@item</li>
                 }
-            </div>
+</ul></div>
+
+        <div class="spec-item" @onclick="() => ToggleSpec(2)"><span>Special Features</span><i class="fas @(specVisibility[2] ? "fa-minus" : "fa-plus")"></i></div>
+        <div class="spec-content @(specVisibility[2] ? "show" : "")"><ul>@foreach (var item in GetSpecList(product.SpecialFeatures)) {
+        <li>@item</li>
+                }
+</ul></div>
+    </div>
+
+    <div class="product-section">
+        <h2>You May Also Like</h2>
+        <div class="product-carousel">
+            @if (relatedProducts != null)
+            {
+                @foreach (var relatedProduct in relatedProducts)
+                {
+                    <ProductCard Product="relatedProduct" />
+                }
+            }
         </div>
-    }
-    else
+    </div>
+        }
+        else
     {
         <p>Loading product details...</p>
     }
 </div>
+
+@* --- LIGHTBOX OVERLAY --- *@
+@if (isLightboxOpen && !string.IsNullOrEmpty(mainImageUrl))
+{
+    <div class="lightbox-overlay" @onclick="CloseLightbox">
+        <button class="lightbox-nav prev" @onclick="PrevLightboxImage" @onclick:stopPropagation>
+            <i class="fas fa-chevron-left"></i>
+        </button>
+
+        <div class="lightbox-content" @onclick:stopPropagation>
+            <img src="@mainImageUrl" alt="Zoomed Product Image" />
+        </div>
+
+        <button class="lightbox-nav next" @onclick="NextLightboxImage" @onclick:stopPropagation>
+            <i class="fas fa-chevron-right"></i>
+        </button>
+
+        <button class="lightbox-close" @onclick="CloseLightbox">&times;</button>
+    </div>
+}
 
 @code {
     [Parameter]
@@ -226,16 +326,15 @@
     private string mainImageUrl;
     private bool[] specVisibility = new bool[3];
 
-    // --- NEW HELPERS TO FIX RZ1010 ERROR ---
+    // --- LIGHTBOX VARIABLES ---
+    private bool isLightboxOpen = false;
+    private List<string> allImageUrls = new();
+    private int currentImageIndex = 0;
 
-    // Checks if a string has value (not null/empty)
+    // Helpers
     private bool HasSpec(string? value) => !string.IsNullOrWhiteSpace(value);
-
-    // Determines if the Highlight Section should appear at all
     private bool ShowHighlights => product != null &&
         (HasSpec(product.Processor) || HasSpec(product.RAM) || HasSpec(product.ROM) || HasSpec(product.Display));
-
-    // ---------------------------------------
 
     protected override async Task OnParametersSetAsync()
     {
@@ -243,7 +342,24 @@
         product = await dbContext.Products.FindAsync(Id);
         if (product != null)
         {
-            mainImageUrl = product.ImageURL1 ?? "/Image/barca.jpeg";
+            // Populate Image List for Lightbox
+            allImageUrls.Clear();
+            if (!string.IsNullOrEmpty(product.ImageURL1)) allImageUrls.Add(product.ImageURL1);
+            if (!string.IsNullOrEmpty(product.ImageURL2)) allImageUrls.Add(product.ImageURL2);
+            if (!string.IsNullOrEmpty(product.ImageURL3)) allImageUrls.Add(product.ImageURL3);
+            if (!string.IsNullOrEmpty(product.ImageURL4)) allImageUrls.Add(product.ImageURL4);
+            if (!string.IsNullOrEmpty(product.ImageURL5)) allImageUrls.Add(product.ImageURL5);
+
+            // Default Main Image
+            if (allImageUrls.Any())
+            {
+                mainImageUrl = allImageUrls[0];
+                currentImageIndex = 0;
+            }
+            else
+            {
+                mainImageUrl = "/Image/barca.jpeg"; // Fallback
+            }
 
             relatedProducts = await dbContext.Products
                 .Where(p => p.ProductCategory == product.ProductCategory && p.Id != product.Id)
@@ -267,25 +383,39 @@
         State.OnStateChange += StateHasChanged;
     }
 
-    private IEnumerable<string> GetImageUrls()
-    {
-        if (product == null) yield break;
-        if (!string.IsNullOrEmpty(product.ImageURL1)) yield return product.ImageURL1;
-        if (!string.IsNullOrEmpty(product.ImageURL2)) yield return product.ImageURL2;
-        if (!string.IsNullOrEmpty(product.ImageURL3)) yield return product.ImageURL3;
-        if (!string.IsNullOrEmpty(product.ImageURL4)) yield return product.ImageURL4;
-        if (!string.IsNullOrEmpty(product.ImageURL5)) yield return product.ImageURL5;
-    }
+    private IEnumerable<string> GetImageUrls() => allImageUrls;
 
     private void SetMainImage(string imageUrl)
     {
         mainImageUrl = imageUrl;
+        // Update index for lightbox logic
+        var index = allImageUrls.IndexOf(imageUrl);
+        if (index >= 0) currentImageIndex = index;
     }
 
-    private void ToggleSpec(int index)
+    // --- LIGHTBOX METHODS ---
+    private void OpenLightbox() => isLightboxOpen = true;
+    private void CloseLightbox() => isLightboxOpen = false;
+
+    private void NextLightboxImage()
     {
-        specVisibility[index] = !specVisibility[index];
+        if (allImageUrls.Count > 0)
+        {
+            currentImageIndex = (currentImageIndex + 1) % allImageUrls.Count;
+            mainImageUrl = allImageUrls[currentImageIndex];
+        }
     }
+
+    private void PrevLightboxImage()
+    {
+        if (allImageUrls.Count > 0)
+        {
+            currentImageIndex = (currentImageIndex - 1 + allImageUrls.Count) % allImageUrls.Count;
+            mainImageUrl = allImageUrls[currentImageIndex];
+        }
+    }
+
+    private void ToggleSpec(int index) => specVisibility[index] = !specVisibility[index];
 
     private string[] GetSpecList(string specs)
     {
@@ -297,18 +427,12 @@
 
     private async Task AddToCart()
     {
-        if (product != null)
-        {
-            await State.AddToCart(product);
-        }
+        if (product != null) await State.AddToCart(product);
     }
 
     private async Task AddToWishlist()
     {
-        if (product != null)
-        {
-            await State.AddToWishlist(product);
-        }
+        if (product != null) await State.AddToWishlist(product);
     }
 
     private async Task BuyNow()
@@ -317,8 +441,5 @@
         NavigationManager.NavigateTo("/checkout-shipping");
     }
 
-    public void Dispose()
-    {
-        State.OnStateChange -= StateHasChanged;
-    }
+    public void Dispose() => State.OnStateChange -= StateHasChanged;
 }
