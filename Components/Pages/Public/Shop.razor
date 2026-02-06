@@ -13,8 +13,6 @@
         <div class="filter-bar">
             <a href="/"><i class="fas fa-home"></i></a>
 
-            @* REMOVED THE LOCAL SEARCH BAR HERE AS REQUESTED *@
-
             <div class="sort-container">
                 <button class="filter-btn" @onclick="ToggleBrandMenu">
                     @(string.IsNullOrEmpty(selectedBrandFilter) ? "All Brands" : selectedBrandFilter)
@@ -55,11 +53,17 @@
         <h1>@(string.IsNullOrEmpty(Search) ? (string.IsNullOrEmpty(selectedBrandFilter) ? "All Products" : $"{selectedBrandFilter} Products") : $"Results for '{Search}'")</h1>
 
         <div class="category-filters">
-            @* "All" button allows resetting category filter manually *@
+            @* 1. "All" Button (Static) *@
             <button class="@(string.IsNullOrEmpty(selectedCategory) ? "active" : "")" @onclick='() => FilterByCategory(null)'>All</button>
-            <button class="@(selectedCategory == "Phones" ? "active" : "")" @onclick='() => FilterByCategory("Phones")'>Phones</button>
-            <button class="@(selectedCategory == "Laptops" ? "active" : "")" @onclick='() => FilterByCategory("Laptops")'>Laptops</button>
-            <button class="@(selectedCategory == "Accessories" ? "active" : "")" @onclick='() => FilterByCategory("Accessories")'>Accessories</button>
+
+            @* 2. Dynamic Categories from DB *@
+            @if (AvailableCategories != null && AvailableCategories.Any())
+            {
+                @foreach (var category in AvailableCategories)
+                {
+                    <button class="@(selectedCategory == category ? "active" : "")" @onclick='() => FilterByCategory(category)'>@category</button>
+                }
+            }
         </div>
     </div>
 
@@ -178,6 +182,9 @@
 
     public List<string> BrandOptions { get; set; } = new List<string>();
 
+    // NEW: List to hold dynamic categories
+    public List<string> AvailableCategories { get; set; } = new List<string>();
+
     private int CurrentPage = 1;
     private int PageSize = 18;
     private int TotalPages;
@@ -185,7 +192,7 @@
     private bool showSortMenu = false;
     private bool showBrandMenu = false;
 
-    // Default to "Phones" only if no search is active
+    // Default to "Phones" only if it exists in DB, otherwise "All"
     private string selectedCategory = "Phones";
     private string selectedBrandFilter = null;
     private string currentSortOption = "latest";
@@ -195,7 +202,24 @@
 
     protected override async Task OnInitializedAsync()
     {
+        // 1. Fetch Brands and Categories dynamically
         BrandOptions = await ProductService.GetAttributeValuesAsync("Brand");
+        AvailableCategories = await ProductService.GetAttributeValuesAsync("Category");
+
+        // 2. Validate the default category selection
+        // If "Phones" doesn't exist in the DB, default to "All" (null) or the first available category
+        if (!AvailableCategories.Contains("Phones") && !string.IsNullOrEmpty(selectedCategory))
+        {
+            if (AvailableCategories.Any())
+            {
+                selectedCategory = AvailableCategories.First();
+            }
+            else
+            {
+                selectedCategory = null; // Default to All
+            }
+        }
+
         RecentlyViewedProducts = await dbContext.Products
             .Where(p => p.Type == MaisonTelecom.Models.ProductType.Physical)
             .OrderByDescending(p => p.Id)
@@ -206,16 +230,13 @@
     protected override async Task OnParametersSetAsync()
     {
         // LOGIC: If a Search term exists (e.g. from the header), we must RESET the category
-        // so that the search looks through EVERYTHING, not just "Phones".
+        // so that the search looks through EVERYTHING.
         if (!string.IsNullOrEmpty(Search))
         {
             selectedCategory = null;
         }
-        else if (string.IsNullOrEmpty(selectedCategory))
-        {
-            // If no search and no category, default back to Phones
-            selectedCategory = "Phones";
-        }
+        // If no search is active and category is null, we can stick to "All" or a default if preferred.
+        // The logic in OnInitialized handles the initial load default.
 
         await UpdateProductList();
     }
@@ -241,7 +262,6 @@
             .AsQueryable();
 
         // 1. Search Logic (Moved to Top Priority)
-        // This ensures "sam" matches "Samsung" using ToLower() for case-insensitivity
         if (!string.IsNullOrEmpty(Search))
         {
             var lowerSearch = Search.ToLower();
@@ -329,7 +349,14 @@
     {
         Search = null;
         selectedBrandFilter = null;
-        selectedCategory = "Phones";
+        selectedCategory = "Phones"; // Or set to null for "All" if you prefer
+
+        // Re-check defaults if Phones isn't available
+        if (AvailableCategories != null && !AvailableCategories.Contains("Phones"))
+        {
+            selectedCategory = null;
+        }
+
         await UpdateProductList();
     }
 }
