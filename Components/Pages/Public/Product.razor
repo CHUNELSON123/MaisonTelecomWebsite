@@ -36,7 +36,6 @@
             margin-top: 10px;
         }
 
-    /* New Styles for Promo Price */
     .old-price {
         text-decoration: line-through;
         color: #999;
@@ -45,9 +44,22 @@
     }
 
     .promo-price {
-        color: #e74c3c; /* Red color for discount */
+        color: #e74c3c;
         font-weight: bold;
         font-size: 1.5rem;
+    }
+
+    /* Centering Highlights */
+    .highlights-grid.centered-grid {
+        display: flex;
+        justify-content: center;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .highlight-item {
+        min-width: 120px;
+        text-align: center;
     }
 </style>
 
@@ -99,31 +111,51 @@
             </div>
         </div>
 
-        <div class="product-highlights">
-            <h2>Product Highlights</h2>
-            <div class="highlights-grid">
-                <div class="highlight-item">
-                    <i class="fas fa-microchip"></i>
-                    <span>@product.Processor</span>
-                    <small>Processor</small>
-                </div>
-                <div class="highlight-item">
-                    <i class="fas fa-memory"></i>
-                    <span>@product.RAM</span>
-                    <small>RAM</small>
-                </div>
-                <div class="highlight-item">
-                    <i class="fas fa-sd-card"></i>
-                    <span>@product.ROM</span>
-                    <small>Storage</small>
-                </div>
-                <div class="highlight-item">
-                    <i class="fas fa-desktop"></i>
-                    <span>@product.Display</span>
-                    <small>Display</small>
+        @if (ShowHighlights)
+        {
+            <div class="product-highlights">
+                <h2>Product Highlights</h2>
+                <div class="highlights-grid centered-grid">
+
+                    @if (HasSpec(product.Processor))
+                    {
+                        <div class="highlight-item">
+                            <i class="fas fa-microchip"></i>
+                            <span>@product.Processor</span>
+                            <small>Processor</small>
+                        </div>
+                    }
+
+                    @if (HasSpec(product.RAM))
+                    {
+                        <div class="highlight-item">
+                            <i class="fas fa-memory"></i>
+                            <span>@product.RAM</span>
+                            <small>RAM</small>
+                        </div>
+                    }
+
+                    @if (HasSpec(product.ROM))
+                    {
+                        <div class="highlight-item">
+                            <i class="fas fa-sd-card"></i>
+                            <span>@product.ROM</span>
+                            <small>Storage</small>
+                        </div>
+                    }
+
+                    @if (HasSpec(product.Display))
+                    {
+                        <div class="highlight-item">
+                            <i class="fas fa-desktop"></i>
+                            <span>@product.Display</span>
+                            <small>Display</small>
+                        </div>
+                    }
+
                 </div>
             </div>
-        </div>
+        }
 
         <div class="tech-specs">
             <h2>Tech Specs</h2>
@@ -193,6 +225,17 @@
     private List<MaisonTelecom.Models.Product> relatedProducts;
     private string mainImageUrl;
     private bool[] specVisibility = new bool[3];
+
+    // --- NEW HELPERS TO FIX RZ1010 ERROR ---
+
+    // Checks if a string has value (not null/empty)
+    private bool HasSpec(string? value) => !string.IsNullOrWhiteSpace(value);
+
+    // Determines if the Highlight Section should appear at all
+    private bool ShowHighlights => product != null &&
+        (HasSpec(product.Processor) || HasSpec(product.RAM) || HasSpec(product.ROM) || HasSpec(product.Display));
+
+    // ---------------------------------------
 
     protected override async Task OnParametersSetAsync()
     {
